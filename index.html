@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kratex TV</title>
+    <!-- Use Google Fonts for dynamic, rich typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- App Configuration will be loaded via JS -->
+
+    <div class="tv-container">
+        <!-- YouTube Player Container -->
+        <div id="player-container">
+            <div id="player"></div>
+        </div>
+
+        <!-- TV Scanlines effect for retro look -->
+        <div class="scanlines"></div>
+
+        <!-- TV Static Overlay -->
+        <canvas id="tv-static"></canvas>
+
+        <!-- TV Overlay (HUD) -->
+        <div class="tv-hud" id="hud">
+            
+            <!-- Main Top Right Logo -->
+            <div class="logo">
+                <span class="logo-kratex">Kratex</span> <span class="logo-tv">TV</span>
+            </div>
+
+            <!-- Program Info Banner (Satellite TV style) -->
+            <div class="info-banner hidden" id="info-banner">
+                <div class="channel-num" id="channel-display">CH --</div>
+                <div class="program-details">
+                    <div class="program-title" id="video-title">Initializing signal...</div>
+                    <div class="program-tags">
+                        <span class="program-category">Music Video</span>
+                        <span class="program-status">• LIVE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remote Controls (Overlay buttons) -->
+            <div class="remote-controls">
+                <div class="remote-section-title">Volume</div>
+                <div class="volume-controls">
+                    <button id="btn-vol-up" class="remote-btn" title="Volume Up">+</button>
+                    <button id="btn-vol-down" class="remote-btn" title="Volume Down">-</button>
+                    <button id="btn-mute" class="remote-btn round-btn" title="Mute">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                    </button>
+                </div>
+                
+                <div class="remote-section-title">Channel</div>
+                <div class="channel-controls">
+                    <button id="btn-ch-prev" class="remote-btn" title="Previous Channel">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <button id="btn-ch-next" class="remote-btn" title="Next Channel">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="script.js"></script>
+</body>
+</html>
