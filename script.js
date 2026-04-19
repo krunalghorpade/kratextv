@@ -4,13 +4,14 @@ let isPlayerReady = false;
 let currentPlaylistVideos = [];
 let staticTimeout;
 let hudTimeout;
-let isPoweredOn = true; // Auto-on
+let isPoweredOn = false; // Start off
 let isSeekingToRandom = false;
 
 // -1 means "ALL", 0..N means specific category
 let activeCategoryIdx = -1; 
 let currentLoadedPlaylistId = null;
 let categorySwitchPending = false;
+let intendedCategoryId = null; // Tracker for what we WANT to play
 
 // Apply zoom from settings
 fetch('settings.json')
@@ -176,6 +177,11 @@ document.addEventListener('keydown', (e) => {
                 else if (document.msExitFullscreen) document.msExitFullscreen();
             }
             break;
+        case 'l':
+        case 'L':
+            const lookBtn = document.getElementById('btn-look');
+            if (lookBtn) lookBtn.click();
+            break;
     }
 });
 
@@ -193,7 +199,7 @@ function onYouTubeIframeAPIReady() {
             'rel': 0,
             'showinfo': 0,
             'iv_load_policy': 3,
-            'mute': 1 // Start muted to bypass autoplay restrictions without interaction
+            'mute': 0
         },
         events: {
             'onReady': onPlayerReady,
@@ -205,8 +211,14 @@ function onYouTubeIframeAPIReady() {
 
 function onPlayerReady(event) {
     isPlayerReady = true;
-    player.setVolume(100); // Force 100% volume on load overriding user cookies
-    player.mute(); // Muting enables autoplay without user gesture
+    player.setVolume(100); 
+    player.unMute();
+    
+    // Auto-select initial intended ID if needed
+    if (APP_CONFIG.categories.length > 0) {
+        intendedCategoryId = APP_CONFIG.categories[0].id;
+    }
+
     if (APP_CONFIG.categories.length > 0 && isPoweredOn) {
         startTV();
     }
@@ -216,29 +228,64 @@ async function onPlayerStateChange(event) {
     
     if (event.data === YT.PlayerState.CUED || event.data === YT.PlayerState.PLAYING) {
         if (categorySwitchPending) {
-            categorySwitchPending = false;
-            currentPlaylistVideos = player.getPlaylist();
+            const fetchedPlaylist = player.getPlaylist();
+            
+            // Defend against ghost 'PLAYING' events from the old playlist before the swap completes
+            if (currentPlaylistVideos && currentPlaylistVideos.length > 0 && fetchedPlaylist && fetchedPlaylist.length > 0 && fetchedPlaylist[0] === currentPlaylistVideos[0]) {
+                return; // Ignore this event, wait for the actual new playlist to populate
+            }
+            
+            currentPlaylistVideos = fetchedPlaylist;
             
             if (currentPlaylistVideos && currentPlaylistVideos.length > 0) {
+                categorySwitchPending = false;
+                currentLoadedPlaylistId = intendedCategoryId; // Shift ID here
                 const randomIdx = Math.floor(Math.random() * currentPlaylistVideos.length);
                 isSeekingToRandom = true;
                 player.playVideoAt(randomIdx);
-                
-                document.getElementById('channel-display').innerText = 'CH ' + (randomIdx + 1).toString().padStart(2, '0');
+            } else if (!window.playlistPollActive) {
+                window.playlistPollActive = true;
+                const pollPlaylist = setInterval(() => {
+                    currentPlaylistVideos = player.getPlaylist();
+                    if (currentPlaylistVideos && currentPlaylistVideos.length > 0) {
+                        clearInterval(pollPlaylist);
+                        window.playlistPollActive = false;
+                        if (categorySwitchPending) {
+                            categorySwitchPending = false;
+                            currentLoadedPlaylistId = intendedCategoryId; // Shift ID here
+                            const randomIdx = Math.floor(Math.random() * currentPlaylistVideos.length);
+                            isSeekingToRandom = true;
+                            player.playVideoAt(randomIdx);
+                        }
+                    }
+                }, 100);
             }
         }
     }
     
     if (event.data === YT.PlayerState.PLAYING) {
+        // Enforce unmuted state aggressively
+        try {
+            player.unMute();
+            player.setVolume(100);
+        } catch(e) {}
+        
+        // Find current category name to display
+        let catName = "Video";
+        const matchedCat = APP_CONFIG.categories.find(c => c.id === currentLoadedPlaylistId);
+        if(matchedCat) catName = matchedCat.name;
+
         if (isSeekingToRandom) {
             isSeekingToRandom = false;
             setTimeout(() => {
                 const duration = player.getDuration();
                 if (duration > 30) {
                     let minPct = 0.20; // 20% default for short music videos
-                    const matchedCat = APP_CONFIG.categories.find(c => c.id === currentLoadedPlaylistId);
-                    if (matchedCat && matchedCat.name.toLowerCase().includes('dj set')) {
-                        minPct = 0.05; // 5% minimum for live DJ sets
+                    if (matchedCat) {
+                        const catLower = matchedCat.name.toLowerCase();
+                        if (catLower.includes('dj') || catLower.includes('podcast') || catLower.includes('interview')) {
+                            minPct = 0.05; // 5% minimum for long-format broadcasts
+                        }
                     }
                     // Max position up to 90%
                     const maxPct = 0.90;
@@ -252,10 +299,10 @@ async function onPlayerStateChange(event) {
         if(videoData) {
             if (videoData.title) document.getElementById('video-title').innerText = videoData.title;
             
-            // Try fetch actual year & description
+            // Try fetch actual description
             if (videoData.video_id) {
+                document.getElementById('video-desc').innerText = "Receiving broadcast metadata...";
                 const meta = await fetchVideoMetadata(videoData.video_id);
-                document.getElementById('year-display').innerText = meta.year ? meta.year : "";
                 if (meta.description) {
                     document.getElementById('video-desc').innerText = meta.description.substring(0, 180) + "...";
                 } else {
@@ -263,12 +310,6 @@ async function onPlayerStateChange(event) {
                 }
             }
         }
-        
-        // Find current category name to display
-        let catName = "Video";
-        let targetId = currentLoadedPlaylistId;
-        const matchedCat = APP_CONFIG.categories.find(c => c.id === targetId);
-        if(matchedCat) catName = matchedCat.name;
         
         document.getElementById('category-display').innerText = catName.toUpperCase();
         wakeUpHUD();
@@ -297,8 +338,9 @@ function playRandomVideo() {
         targetCategory = APP_CONFIG.categories[activeCategoryIdx];
     }
     
+    intendedCategoryId = targetCategory.id;
+    
     if (currentLoadedPlaylistId !== targetCategory.id || !currentPlaylistVideos || currentPlaylistVideos.length === 0) {
-        currentLoadedPlaylistId = targetCategory.id;
         categorySwitchPending = true;
         player.loadPlaylist({
             list: targetCategory.id,
@@ -308,7 +350,6 @@ function playRandomVideo() {
         });
     } else {
         const randomIdx = Math.floor(Math.random() * currentPlaylistVideos.length);
-        document.getElementById('channel-display').innerText = 'CH ' + (randomIdx + 1).toString().padStart(2, '0');
         isSeekingToRandom = true;
         player.playVideoAt(randomIdx);
     }
