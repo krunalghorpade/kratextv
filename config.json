@@ -1,4 +1,16 @@
 {
-  "playlist_url": "https://youtube.com/playlist?list=PL9ExUjv_4xfHIWXHRYt77fXg1oBtzoOBK",
-  "playlist_id": "PL9ExUjv_4xfHIWXHRYt77fXg1oBtzoOBK"
+  "categories": [
+    {
+      "name": "Live DJ Sets",
+      "id": "PL9ExUjv_4xfHyE70ZC4BDxRR-X1upUjbh"
+    },
+    {
+      "name": "Podcasts/Interviews",
+      "id": "PL9ExUjv_4xfGgw5TiCZdO0kdfTsuIcdRv"
+    },
+    {
+      "name": "Music Videos",
+      "id": "PL9ExUjv_4xfHIWXHRYt77fXg1oBtzoOBK"
+    }
+  ]
 }

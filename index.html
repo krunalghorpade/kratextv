@@ -4,28 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kratex TV</title>
-    <!-- Use Google Fonts for dynamic, rich typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Use Custom Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barriecito&family=Dosis:wght@200..800&family=Special+Gothic+Condensed+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- App Configuration will be loaded via JS -->
 
     <div class="tv-container">
-        <!-- Power Screen (Fixes Autoplay block) -->
+        <!-- Power Screen (Fixes Autoplay block & Landing Page) -->
         <div class="power-screen" id="power-screen">
-            <button class="power-btn" id="btn-power">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                <div style="font-size: 16px; margin-top: 10px; font-family: 'Orbitron', sans-serif;">POWER ON</div>
-            </button>
+            <div class="landing-content">
+                <img src="assets/images/tvlogo.png" alt="Kratex TV Logo" class="landing-logo">
+                <p>Welcome to Kratex TV. An interactive 24/7 channel.</p>
+                <div class="landing-links">
+                    <a href="https://youtube.com/" target="_blank">YouTube</a>
+                    <a href="https://instagram.com/" target="_blank">Instagram</a>
+                    <a href="https://spotify.com/" target="_blank">Spotify</a>
+                </div>
+                <button class="power-btn" id="btn-power">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                    <div style="font-size: 16px; margin-top: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">POWER ON</div>
+                </button>
+            </div>
         </div>
         <!-- YouTube Player Container -->
         <div id="player-container">
             <div id="player"></div>
         </div>
 
-        <!-- TV Scanlines effect for retro look -->
+        <!-- Look Overlays -->
         <div class="scanlines"></div>
+        <div class="noise-overlay"></div>
+        <div class="vhs-filter"></div>
 
         <!-- TV Static Overlay -->
         <canvas id="tv-static"></canvas>
@@ -35,40 +49,77 @@
             
             <!-- Main Top Right Logo -->
             <div class="logo">
-                <span class="logo-kratex">Kratex</span> <span class="logo-tv">TV</span>
+                <img src="assets/images/tvlogo.png" alt="Kratex TV">
             </div>
 
             <!-- Program Info Banner (Satellite TV style) -->
-            <div class="info-banner hidden" id="info-banner">
-                <div class="channel-num" id="channel-display">CH --</div>
-                <div class="program-details">
-                    <div class="program-title" id="video-title">Initializing signal...</div>
-                    <div class="program-tags">
-                        <span class="program-category">Music Video</span>
-                        <span class="program-status">• LIVE</span>
+            <div class="info-banner hidden retro-info-banner" id="info-banner">
+                <div class="channel-num retro-channel" id="channel-display">CH --</div>
+                <div class="program-details retro-details">
+                    <div class="program-header">
+                        <span class="program-title" id="video-title">Initializing signal...</span>
+                        <span class="program-year" id="year-display">1999</span>
                     </div>
+                    <div class="program-desc" id="video-desc">No description data transmitted.</div>
+                    <div class="program-tags">
+                        <span class="program-category" id="category-display">Music Video</span>
+                    </div>
+                </div>
+                <button id="btn-open-video" class="open-video-btn retro-btn" title="Open Video in YouTube">FULL VIDEO</button>
+            </div>
+
+            <!-- Keyboard Hints -->
+            <div class="keyboard-hints">
+                [ ◀ ▶ ] CH &nbsp; [ ▲ ▼ ] VOL &nbsp; [ F ] FULL
+            </div>
+
+            <!-- Floating Actions -->
+            <div class="floating-actions">
+                <div id="btn-power-off-floating" class="floating-btn" title="Power Off TV">
+                    <i class="fa-solid fa-power-off"></i>
+                </div>
+                <div id="btn-fullscreen-toggle" class="floating-btn" title="Toggle Fullscreen">
+                    <i class="fa-solid fa-expand"></i>
+                </div>
+                <div id="btn-remote-toggle" class="floating-btn" title="Toggle Remote">
+                    <i class="fa-solid fa-gamepad"></i>
                 </div>
             </div>
 
             <!-- Remote Controls (Overlay buttons) -->
-            <div class="remote-controls">
+            <div class="remote-controls hidden" id="remote-box">
+                
+                <div class="remote-section-title">Power/Mode</div>
+                <div class="tv-controls">
+                    <button id="btn-power-off" class="remote-btn minimal-btn" title="Power Off TV">OFF</button>
+                </div>
+                
+                <div class="remote-section-title">Category / Look</div>
+                <select id="category-dropdown" class="retro-dropdown">
+                    <option value="-1">ALL CATEGORIES</option>
+                </select>
+                <div class="tv-controls">
+                    <button id="btn-look-toggle" class="remote-btn minimal-btn" title="Toggle Look">LOOK: RETRO</button>
+                </div>
+                
                 <div class="remote-section-title">Volume</div>
-                <div class="volume-controls">
-                    <button id="btn-vol-up" class="remote-btn" title="Volume Up">+</button>
-                    <button id="btn-vol-down" class="remote-btn" title="Volume Down">-</button>
-                    <button id="btn-mute" class="remote-btn round-btn" title="Mute">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
-                    </button>
+                <div class="volume-controls minimal-controls-box">
+                    <button id="btn-vol-up" class="remote-btn minimal-btn" title="Volume Up">VOL +</button>
+                    <button id="btn-vol-down" class="remote-btn minimal-btn" title="Volume Down">VOL -</button>
+                    <button id="btn-mute" class="remote-btn minimal-btn" title="Mute">MUTE</button>
                 </div>
                 
                 <div class="remote-section-title">Channel</div>
-                <div class="channel-controls">
-                    <button id="btn-ch-prev" class="remote-btn" title="Previous Channel">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                    </button>
-                    <button id="btn-ch-next" class="remote-btn" title="Next Channel">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
+                <div class="channel-controls minimal-controls-box">
+                    <button id="btn-ch-prev" class="remote-btn minimal-btn" title="Previous Channel">CH PREV</button>
+                    <button id="btn-ch-next" class="remote-btn minimal-btn" title="Next Channel">CH NEXT</button>
+                </div>
+            </div>
+
+            <!-- Marquee Ticker at the bottom -->
+            <div class="ticker-container" id="ticker-container">
+                <div class="ticker-content" id="ticker-content">
+                    <!-- Populated by JS -->
                 </div>
             </div>
 

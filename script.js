@@ -1,34 +1,94 @@
-let APP_CONFIG = {};
+let APP_CONFIG = { categories: [] };
 let player;
 let isPlayerReady = false;
-let currentPlaylist = [];
+let currentPlaylistVideos = [];
 let staticTimeout;
 let hudTimeout;
-let isFirstLoad = true;
+let isPoweredOn = true; // Auto-on
 let isSeekingToRandom = false;
 
-// Fetch config
+// -1 means "ALL", 0..N means specific category
+let activeCategoryIdx = -1; 
+let currentLoadedPlaylistId = null;
+let categorySwitchPending = false;
+
+// Apply zoom from settings
+fetch('settings.json')
+    .then(r => r.json())
+    .then(data => {
+        if (data.zoom) {
+            document.getElementById('player').style.transform = `scale(${data.zoom})`;
+        }
+    })
+    .catch(err => console.error('Failed to load settings', err));
+
+// Fetch Config
 fetch('config.json')
     .then(r => r.json())
     .then(data => {
-        let id = data.playlist_id;
-        if (!id && data.playlist_url) {
-            const match = data.playlist_url.match(/list=([^&]+)/);
-            if (match) id = match[1];
-        }
-        APP_CONFIG.playlistId = id;
-        
-        // If player is already ready but was waiting for config
-        if (isPlayerReady && APP_CONFIG.playlistId) {
-            player.loadPlaylist({
-                list: APP_CONFIG.playlistId,
-                listType: 'playlist',
-                index: 0,
-                suggestedQuality: 'hd1080'
-            });
+        if (data.categories) {
+            APP_CONFIG.categories = data.categories;
+            const dropdown = document.getElementById('category-dropdown');
+            if (dropdown) {
+                data.categories.forEach((cat, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.innerText = cat.name.toUpperCase();
+                    dropdown.appendChild(opt);
+                });
+            }
+            if (isPlayerReady && isPoweredOn) {
+                startTV();
+            }
         }
     })
     .catch(err => console.error('Failed to load config', err));
+
+// Fetch Ticker
+fetch('ticker.json')
+    .then(r => r.json())
+    .then(data => {
+        const tickerContent = document.getElementById('ticker-content');
+        if (data.messages && Array.isArray(data.messages)) {
+            const fullText = data.messages.join(' &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ');
+            tickerContent.innerHTML = fullText + ' &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ' + fullText + ' &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ' + fullText;
+        }
+        if (data.speed) {
+            tickerContent.style.animationDuration = data.speed + 's';
+        }
+    })
+    .catch(err => console.error('Failed to load ticker', err));
+
+async function fetchVideoMetadata(videoId) {
+    try {
+        const response = await fetch(`https://yt.lemnoslife.com/noKey/videos?part=snippet&id=${videoId}`);
+        const data = await response.json();
+        if (data.items && data.items.length > 0) {
+            const snippet = data.items[0].snippet;
+            return {
+                year: snippet.publishedAt ? snippet.publishedAt.substring(0, 4) : "",
+                description: snippet.description || ""
+            };
+        }
+    } catch(err) {
+        console.warn("Failed to fetch exact year", err);
+    }
+    return { year: "", description: "" };
+}
+
+function startTV() {
+    if (APP_CONFIG.categories.length > 0 && isPlayerReady) {
+        document.getElementById('power-screen').classList.add('hidden');
+        isPoweredOn = true;
+        if (!currentLoadedPlaylistId) {
+            playRandomVideo();
+        } else {
+            player.playVideo();
+            showStatic(1000);
+            wakeUpHUD();
+        }
+    }
+}
 
 // TV Static Canvas Logic
 const canvas = document.getElementById('tv-static');
@@ -48,13 +108,12 @@ function drawStatic() {
     const imgData = ctx.createImageData(w, h);
     const data = imgData.data;
 
-    // Generate noise
     for (let i = 0; i < data.length; i += 4) {
         const color = Math.floor(Math.random() * 255);
-        data[i] = color;     // r
-        data[i + 1] = color; // g
-        data[i + 2] = color; // b
-        data[i + 3] = 255;   // a
+        data[i] = color;
+        data[i + 1] = color;
+        data[i + 2] = color;
+        data[i + 3] = 255;
     }
     ctx.putImageData(imgData, 0, 0);
     animationId = requestAnimationFrame(drawStatic);
@@ -62,9 +121,7 @@ function drawStatic() {
 
 function showStatic(durationMs = 1200) {
     canvas.classList.add('active');
-    if (!animationId) {
-        drawStatic();
-    }
+    if (!animationId) drawStatic();
     
     clearTimeout(staticTimeout);
     staticTimeout = setTimeout(() => {
@@ -78,16 +135,49 @@ function showStatic(durationMs = 1200) {
 
 // HUD Logic
 function wakeUpHUD() {
+    if (!isPoweredOn) return;
     const banner = document.getElementById('info-banner');
     banner.classList.remove('hidden');
     clearTimeout(hudTimeout);
     hudTimeout = setTimeout(() => {
         banner.classList.add('hidden');
-    }, 5000); // Hide after 5 seconds of inactivity
+    }, 5000);
 }
 
 document.addEventListener('mousemove', wakeUpHUD);
 document.addEventListener('click', wakeUpHUD);
+document.addEventListener('keydown', (e) => {
+    wakeUpHUD();
+    if (!isPlayerReady || !isPoweredOn) return;
+    
+    switch(e.key) {
+        case 'ArrowRight':
+        case 'ArrowLeft':
+            playRandomVideo();
+            break;
+        case 'ArrowUp':
+            if(player.isMuted()) player.unMute();
+            player.setVolume(Math.min(player.getVolume() + 10, 100));
+            break;
+        case 'ArrowDown':
+            if(player.isMuted()) player.unMute();
+            player.setVolume(Math.max(player.getVolume() - 10, 0));
+            break;
+        case 'f':
+        case 'F':
+            const elem = document.documentElement;
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) elem.requestFullscreen();
+                else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+                else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
+            }
+            break;
+    }
+});
 
 // YouTube API Initialization
 function onYouTubeIframeAPIReady() {
@@ -96,14 +186,14 @@ function onYouTubeIframeAPIReady() {
         width: '100%',
         playerVars: {
             'autoplay': 1,
-            'controls': 0, // Hide UI
+            'controls': 0,
             'disablekb': 1,
             'fs': 0,
             'modestbranding': 1,
             'rel': 0,
             'showinfo': 0,
             'iv_load_policy': 3,
-            'mute': 0
+            'mute': 1 // Start muted to bypass autoplay restrictions without interaction
         },
         events: {
             'onReady': onPlayerReady,
@@ -115,52 +205,75 @@ function onYouTubeIframeAPIReady() {
 
 function onPlayerReady(event) {
     isPlayerReady = true;
-    player.setVolume(50);
-    
-    // Attempt to play on load (browsers might block autoplay with sound, but we'll try)
-    if(APP_CONFIG && APP_CONFIG.playlistId) {
-        player.loadPlaylist({
-            list: APP_CONFIG.playlistId,
-            listType: 'playlist',
-            index: 0,
-            suggestedQuality: 'hd1080'
-        });
+    player.setVolume(100); // Force 100% volume on load overriding user cookies
+    player.mute(); // Muting enables autoplay without user gesture
+    if (APP_CONFIG.categories.length > 0 && isPoweredOn) {
+        startTV();
     }
 }
 
-function onPlayerStateChange(event) {
-    // When playlist metadata is loaded
+async function onPlayerStateChange(event) {
+    
     if (event.data === YT.PlayerState.CUED || event.data === YT.PlayerState.PLAYING) {
-        if(isFirstLoad && currentPlaylist.length === 0) {
-            currentPlaylist = player.getPlaylist();
-            if(currentPlaylist && currentPlaylist.length > 0) {
-                isFirstLoad = false;
-                playRandomVideo();
+        if (categorySwitchPending) {
+            categorySwitchPending = false;
+            currentPlaylistVideos = player.getPlaylist();
+            
+            if (currentPlaylistVideos && currentPlaylistVideos.length > 0) {
+                const randomIdx = Math.floor(Math.random() * currentPlaylistVideos.length);
+                isSeekingToRandom = true;
+                player.playVideoAt(randomIdx);
+                
+                document.getElementById('channel-display').innerText = 'CH ' + (randomIdx + 1).toString().padStart(2, '0');
             }
         }
     }
     
     if (event.data === YT.PlayerState.PLAYING) {
-        // If we just switched channels, jump to a random point in the video
         if (isSeekingToRandom) {
             isSeekingToRandom = false;
-            const duration = player.getDuration();
-            if (duration > 60) {
-                // Seek to somewhere in the middle 80% to avoid immediate endings
-                const randomTime = Math.floor(Math.random() * (duration * 0.8));
-                player.seekTo(randomTime, true);
+            setTimeout(() => {
+                const duration = player.getDuration();
+                if (duration > 30) {
+                    let minPct = 0.20; // 20% default for short music videos
+                    const matchedCat = APP_CONFIG.categories.find(c => c.id === currentLoadedPlaylistId);
+                    if (matchedCat && matchedCat.name.toLowerCase().includes('dj set')) {
+                        minPct = 0.05; // 5% minimum for live DJ sets
+                    }
+                    // Max position up to 90%
+                    const maxPct = 0.90;
+                    const randomTime = Math.floor(duration * minPct + Math.random() * (duration * (maxPct - minPct)));
+                    player.seekTo(randomTime, true);
+                }
+            }, 500);
+        }
+        
+        const videoData = player.getVideoData();
+        if(videoData) {
+            if (videoData.title) document.getElementById('video-title').innerText = videoData.title;
+            
+            // Try fetch actual year & description
+            if (videoData.video_id) {
+                const meta = await fetchVideoMetadata(videoData.video_id);
+                document.getElementById('year-display').innerText = meta.year ? meta.year : "";
+                if (meta.description) {
+                    document.getElementById('video-desc').innerText = meta.description.substring(0, 180) + "...";
+                } else {
+                    document.getElementById('video-desc').innerText = "No broadcast description transmitted.";
+                }
             }
         }
         
-        // Update HUD
-        const videoData = player.getVideoData();
-        if(videoData && videoData.title) {
-            document.getElementById('video-title').innerText = videoData.title;
-        }
+        // Find current category name to display
+        let catName = "Video";
+        let targetId = currentLoadedPlaylistId;
+        const matchedCat = APP_CONFIG.categories.find(c => c.id === targetId);
+        if(matchedCat) catName = matchedCat.name;
+        
+        document.getElementById('category-display').innerText = catName.toUpperCase();
         wakeUpHUD();
     }
     
-    // Auto change channel on video end
     if (event.data === YT.PlayerState.ENDED) {
         playRandomVideo();
     }
@@ -172,20 +285,118 @@ function onPlayerError(event) {
 }
 
 function playRandomVideo() {
-    if(!isPlayerReady || !currentPlaylist || currentPlaylist.length === 0) return;
+    if(!isPlayerReady || APP_CONFIG.categories.length === 0) return;
     
-    const randomIdx = Math.floor(Math.random() * currentPlaylist.length);
-    document.getElementById('channel-display').innerText = 'CH ' + (randomIdx + 1).toString().padStart(2, '0');
+    showStatic(1200);
     
-    showStatic(1000);
-    isSeekingToRandom = true;
-    player.playVideoAt(randomIdx);
+    let targetCategory;
+    if (activeCategoryIdx === -1) {
+        const rIndex = Math.floor(Math.random() * APP_CONFIG.categories.length);
+        targetCategory = APP_CONFIG.categories[rIndex];
+    } else {
+        targetCategory = APP_CONFIG.categories[activeCategoryIdx];
+    }
+    
+    if (currentLoadedPlaylistId !== targetCategory.id || !currentPlaylistVideos || currentPlaylistVideos.length === 0) {
+        currentLoadedPlaylistId = targetCategory.id;
+        categorySwitchPending = true;
+        player.loadPlaylist({
+            list: targetCategory.id,
+            listType: 'playlist',
+            index: 0,
+            suggestedQuality: 'hd1080'
+        });
+    } else {
+        const randomIdx = Math.floor(Math.random() * currentPlaylistVideos.length);
+        document.getElementById('channel-display').innerText = 'CH ' + (randomIdx + 1).toString().padStart(2, '0');
+        isSeekingToRandom = true;
+        player.playVideoAt(randomIdx);
+    }
     wakeUpHUD();
 }
 
 // Attach Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     
+    document.getElementById('btn-power').addEventListener('click', () => {
+        isPoweredOn = true;
+        // Unmute upon explicit interaction so they hear it
+        if(isPlayerReady) player.unMute();
+        
+        if(isPlayerReady && APP_CONFIG.categories.length > 0) {
+            startTV();
+        } else {
+            document.querySelector('#btn-power div').innerText = "CONNECTING...";
+        }
+    });
+    
+    // Remote Toggle Button
+    document.getElementById('btn-remote-toggle').addEventListener('click', () => {
+        const remoteBox = document.getElementById('remote-box');
+        remoteBox.classList.toggle('hidden');
+    });
+
+    const handlePowerOff = () => {
+        isPoweredOn = false;
+        if(isPlayerReady) player.pauseVideo();
+        document.getElementById('power-screen').classList.remove('hidden');
+        document.getElementById('remote-box').classList.add('hidden');
+        document.querySelector('#btn-power div').innerText = "POWER ON";
+    };
+
+    document.getElementById('btn-power-off').addEventListener('click', handlePowerOff);
+    
+    const floatingOff = document.getElementById('btn-power-off-floating');
+    if (floatingOff) {
+        floatingOff.addEventListener('click', handlePowerOff);
+    }
+    
+    // Look Toggle
+    const looks = ['look-retro', 'look-clean', 'look-y2k'];
+    const lookNames = ['LOOK: RETRO', 'LOOK: CLEAN', 'LOOK: Y2K'];
+    let currentLookIdx = 2; // Default to Y2K
+    document.body.classList.add(looks[currentLookIdx]);
+    
+    const btnLook = document.getElementById('btn-look-toggle');
+    if (btnLook) {
+        btnLook.innerText = lookNames[currentLookIdx];
+        btnLook.addEventListener('click', () => {
+            document.body.classList.remove(looks[currentLookIdx]);
+            currentLookIdx = (currentLookIdx + 1) % looks.length;
+            document.body.classList.add(looks[currentLookIdx]);
+            btnLook.innerText = lookNames[currentLookIdx];
+        });
+    }
+
+    // Category Dropdown
+    document.getElementById('category-dropdown').addEventListener('change', (e) => {
+        activeCategoryIdx = parseInt(e.target.value, 10);
+        playRandomVideo(); 
+    });
+    
+    // Fullscreen Toggle
+    document.getElementById('btn-fullscreen-toggle').addEventListener('click', () => {
+        const elem = document.documentElement;
+        if (!document.fullscreenElement) {
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+    });
+    
+    document.getElementById('btn-open-video').addEventListener('click', () => {
+        if(isPlayerReady) {
+            const videoData = player.getVideoData();
+            if(videoData && videoData.video_id) {
+                window.open('https://youtube.com/watch?v=' + videoData.video_id, '_blank');
+            }
+        }
+    });
+
     document.getElementById('btn-ch-next').addEventListener('click', () => {
         playRandomVideo();
     });
@@ -200,8 +411,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if(player.isMuted()) player.unMute();
             let vol = player.getVolume();
             player.setVolume(Math.min(vol + 10, 100));
-            updateMuteIcon();
-            wakeUpHUD();
         }
     });
     
@@ -210,35 +419,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if(player.isMuted()) player.unMute();
             let vol = player.getVolume();
             player.setVolume(Math.max(vol - 10, 0));
-            updateMuteIcon();
-            wakeUpHUD();
         }
     });
     
-    // Mute Toggle
     document.getElementById('btn-mute').addEventListener('click', () => {
         if(isPlayerReady) {
             if(player.isMuted() || player.getVolume() === 0) {
                 player.unMute();
-                if(player.getVolume() === 0) player.setVolume(50);
+                if(player.getVolume() === 0) player.setVolume(100);
+                document.getElementById('btn-mute').innerText = 'MUTE';
             } else {
                 player.mute();
+                document.getElementById('btn-mute').innerText = 'UNMUTE';
             }
-            updateMuteIcon();
-            wakeUpHUD();
         }
     });
-
-    function updateMuteIcon() {
-        const btn = document.getElementById('btn-mute');
-        if (player.isMuted() || player.getVolume() === 0) {
-            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>'; // Mute icon (x)
-        } else {
-            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>'; // Vol icon (waves)
-        }
-    }
-
-    // Initial show of HUD
-    wakeUpHUD();
-    updateMuteIcon(); // wait, player not ready yet. Let's do it simple.
 });
