@@ -986,6 +986,20 @@ body.look-y2k *:not(i) {
         font-weight: 900;
         letter-spacing: 2px;
         text-transform: uppercase;
+        text-align: center; /* Explicitly centered */
+        width: 100%;
+    }
+
+    /* Branding - TOP CENTER ON MOBILE */
+    .logo {
+        top: 20px !important;
+        right: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    .logo img {
+        height: 22px !important;
     }
 
     @keyframes hint-fade {
@@ -1072,30 +1086,33 @@ body.look-y2k *:not(i) {
         font-size: 14px;
     }
 
-    /* HUD / Info Banner - WIDE & OVER BUTTONS */
+    /* HUD / Info Banner - SLIM & WIDE */
     .retro-info-banner {
         left: 50% !important;
         transform: translateX(-50%) !important;
-        bottom: 145px !important; /* Positioned clearly above buttons */
+        bottom: 145px !important;
         width: 92% !important;
-        flex-direction: row !important; /* Wide horizontal layout */
+        min-height: auto !important; /* Remove large min-height */
+        height: auto !important;
+        flex-direction: row !important;
         align-items: center !important;
-        padding: 12px 15px !important;
-        border-width: 3px !important;
-        max-width: 500px !important;
-        border-radius: 15px !important;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9) !important;
+        padding: 6px 12px !important; /* Slimmer padding */
+        border-width: 2px !important;
+        max-width: 450px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9) !important;
     }
 
     .retro-details {
         width: 100%;
-        padding: 10px 15px !important;
+        padding: 5px 12px !important;
     }
 
     .program-title {
-        font-size: 14px !important;
+        font-size: 13px !important;
         text-align: left;
-        letter-spacing: 0.5px !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
     }
 
     .program-desc,
