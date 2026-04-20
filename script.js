@@ -121,6 +121,23 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
 }
 window.addEventListener('resize', resizeCanvas);
+
+// Mobile Swipe Navigation
+let touchStartY = 0;
+document.addEventListener('touchstart', e => {
+    touchStartY = e.changedTouches[0].screenY;
+}, {passive: true});
+
+document.addEventListener('touchend', e => {
+    const touchEndY = e.changedTouches[0].screenY;
+    const diff = touchStartY - touchEndY;
+    
+    // Threshold of 50px for a swipe
+    if (Math.abs(diff) > 50) {
+        playRandomVideo();
+    }
+}, {passive: true});
+
 resizeCanvas();
 
 function drawStatic() {
@@ -442,6 +459,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.getElementById('btn-ch-prev').addEventListener('click', () => {
+        playRandomVideo();
+    });
+
+    document.getElementById('btn-ch-prev-mobile').addEventListener('click', () => {
+        playRandomVideo();
+    });
+    
+    document.getElementById('btn-ch-next-mobile').addEventListener('click', () => {
         playRandomVideo();
     });
     

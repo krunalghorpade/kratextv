@@ -106,8 +106,14 @@
             </div>
 
             <!-- Keyboard Hints -->
-            <div class="keyboard-hints">
+            <div class="keyboard-hints desktop-only">
                 [ ◀ ▶ ] CH &nbsp; [ ▲ ▼ ] VOL &nbsp; [ F ] FULL &nbsp; [ L ] LOOK
+            </div>
+
+            <!-- Mobile Swipe Hint -->
+            <div class="swipe-hint mobile-only">
+                <i class="fa-solid fa-up-down"></i>
+                <span>SWIPE UP / DOWN TO CHANGE CH</span>
             </div>
 
             <!-- Floating Actions -->
@@ -120,6 +126,12 @@
                 </div>
                 <div id="btn-remote-toggle" class="floating-btn" title="Toggle Remote">
                     <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div id="btn-ch-prev-mobile" class="floating-btn mobile-only-btn" title="Previous Channel">
+                    <i class="fa-solid fa-backward"></i>
+                </div>
+                <div id="btn-ch-next-mobile" class="floating-btn mobile-only-btn" title="Next Channel">
+                    <i class="fa-solid fa-forward"></i>
                 </div>
             </div>
 

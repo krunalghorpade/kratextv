@@ -842,3 +842,203 @@ body.look-y2k, body.look-y2k *:not(i) {
     width: 100px !important;
     font-size: 14px !important;
 }
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: flex !important;
+    }
+
+    .swipe-hint {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255,255,255,0.4);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        pointer-events: none;
+        z-index: 100;
+        animation: hint-fade 4s infinite;
+    }
+
+    .swipe-hint i {
+        font-size: 24px;
+        animation: swipe-move 1.5s infinite ease-in-out;
+    }
+
+    .swipe-hint span {
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    @keyframes hint-fade {
+        0%, 100% { opacity: 0; }
+        20%, 80% { opacity: 0.6; }
+    }
+
+    @keyframes swipe-move {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+    /* Power Screen / Landing Page */
+    .tv-bezel {
+        padding: 40px 20px;
+        border-radius: 35px;
+        width: 90%;
+        border-width: 4px;
+        margin: 0 auto;
+    }
+
+    .landing-logo {
+        max-width: 100px;
+        margin-bottom: 20px;
+    }
+
+    .landing-description strong {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
+
+    .landing-description {
+        font-size: 12px;
+        letter-spacing: 1px;
+        line-height: 1.5;
+        margin-bottom: 25px;
+    }
+
+    .primary-links {
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+
+    .primary-links a {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    .power-core {
+        margin-bottom: 30px;
+    }
+
+    .power-btn {
+        width: 110px;
+        height: 110px;
+        border-width: 6px;
+    }
+
+    .power-symbol svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .social-icon-grid {
+        gap: 12px;
+    }
+
+    .social-icon-grid a {
+        font-size: 14px;
+    }
+
+    /* HUD / Info Banner - MINIMAL & SMALL */
+    .retro-info-banner {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 22% !important;
+        width: 80% !important;
+        flex-direction: column !important;
+        padding: 10px !important;
+        border-width: 3px !important;
+        max-width: 300px !important;
+    }
+
+    .retro-details {
+        width: 100%;
+        padding: 8px 12px !important;
+    }
+
+    .program-title {
+        font-size: 13px !important;
+        text-align: center;
+    }
+
+    .program-desc {
+        display: none !important; /* Hide description for minimal look */
+    }
+
+    .open-video-btn.retro-btn {
+        display: none !important; /* Hide full video button for minimal look */
+    }
+
+    /* Branding */
+    .logo {
+        top: 10px;
+        right: 10px;
+    }
+
+    .logo img {
+        height: 25px;
+    }
+
+    /* Floating buttons - BOTTOM CENTER WITH CHANNEL BUTTONS */
+    .floating-actions {
+        bottom: 25px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        flex-direction: row !important;
+        gap: 10px;
+        width: auto;
+    }
+
+    .mobile-only-btn {
+        display: flex !important;
+    }
+
+    .floating-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+
+    /* ASPECT RATIO 4:3 FOR SCREEN */
+    #player-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #player {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100vw;
+        height: 75vw; /* 4:3 aspect ratio (100 * 3/4) */
+        transform: translate(-50%, -50%) !important;
+    }
+
+    /* Fill the 4:3 container with 16:9 content */
+    body.look-retro #player, 
+    body.look-y2k #player, 
+    body.look-bw #player,
+    body.look-clean #player {
+        transform: translate(-50%, -50%) scale(1.4) !important;
+    }
+}
+
+.mobile-only-btn {
+    display: none;
+}
