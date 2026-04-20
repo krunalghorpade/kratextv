@@ -1,16 +1,20 @@
 {
   "categories": [
     {
+      "name": "Podcasts/Interviews",
+      "id": "PL9ExUjv_4xfGgw5TiCZdO0kdfTsuIcdRv"
+    },
+    {
       "name": "Music",
       "id": "PL9ExUjv_4xfHyE70ZC4BDxRR-X1upUjbh"
     },
     {
-      "name": "Podcast/Interviews",
-      "id": "PL9ExUjv_4xfGgw5TiCZdO0kdfTsuIcdRv"
-    },
-    {
       "name": "Dj Sets",
       "id": "PL9ExUjv_4xfHIWXHRYt77fXg1oBtzoOBK"
+    },
+    {
+      "name": "Vlogs",
+      "id": "PL9ExUjv_4xfEJEWJ1jN-eOv3nhHgibgab"
     }
   ]
 }
