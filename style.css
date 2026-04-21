@@ -347,6 +347,7 @@ body.look-y2k *:not(i) {
 .info-banner.hidden {
     opacity: 0;
     transform: translateY(30px);
+    pointer-events: none;
 }
 
 .channel-num {
@@ -409,7 +410,7 @@ body.look-y2k *:not(i) {
 .remote-controls {
     position: absolute;
     bottom: 120px;
-    right: 50px;
+    right: 110px;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -430,7 +431,7 @@ body.look-y2k *:not(i) {
 .floating-actions {
     position: absolute;
     bottom: 50px;
-    right: 50px;
+    right: 110px;
     display: flex;
     gap: 15px;
     z-index: 105;
@@ -992,14 +993,14 @@ body.look-y2k *:not(i) {
 
     /* Branding - TOP CENTER ON MOBILE */
     .logo {
-        top: 20px !important;
+        top: 25px !important;
         right: auto !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
     }
 
     .logo img {
-        height: 22px !important;
+        height: 35px !important;
     }
 
     @keyframes hint-fade {
@@ -1125,15 +1126,7 @@ body.look-y2k *:not(i) {
         display: none !important;
     }
 
-    /* Branding */
-    .logo {
-        top: 10px;
-        right: 10px;
-    }
 
-    .logo img {
-        height: 20px;
-    }
 
     /* Floating buttons - BOTTOM CENTER WITH CHANNEL BUTTONS */
     .floating-actions {
@@ -1186,4 +1179,123 @@ body.look-y2k *:not(i) {
 
 .mobile-only, .mobile-only-btn {
     display: none !important;
+}
+
+/* Video Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Higher than HUD */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: #0d121f;
+    border: 6px solid #080c16;
+    border-radius: 24px;
+    padding: 25px;
+    width: 85%;
+    max-width: 320px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px #1a2233;
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay:not(.hidden) .modal-content {
+    transform: translateY(0);
+}
+
+.modal-logo {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.modal-body h3 {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 1.5px;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+}
+
+.modal-body p {
+    color: #8ca2bf;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-btn {
+    flex: 1;
+    height: 50px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 3px solid #080c16;
+    text-transform: uppercase;
+}
+
+.yes-btn {
+    background: linear-gradient(135deg, #00e0ff, #005f8f);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.no-btn {
+    background: #1a2233;
+    color: #5d708a;
+}
+
+.modal-btn:active {
+    transform: scale(0.92);
+}
+
+@media (max-width: 768px) {
+    .info-banner:active {
+        background: #1a2233 !important;
+        transform: translateX(-50%) scale(0.98) !important;
+    }
+}
+
+/* Portrait / Shorts View Styles */
+body.is-portrait #player {
+    transform: scale(1) !important;
+    object-fit: contain !important;
+}
+
+/* On Mobile, ensure portrait videos fit within the 4:3 container without 1.4x zoom override */
+@media (max-width: 768px) {
+    body.is-portrait #player {
+        transform: translate(-50%, -50%) scale(1) !important;
+        height: 100vh !important;
+        width: 100vw !important;
+    }
 }

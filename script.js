@@ -285,7 +285,7 @@ function onPlayerStateChange(event) {
                 const matchedCatName = VIDEO_CATEGORY_MAP[currentVideoId];
                 if (matchedCatName) {
                     const cn = matchedCatName.toLowerCase();
-                    if (cn.includes('dj') || cn.includes('podcast') || cn.includes('interview')) {
+                    if (cn.includes('dj') || cn.includes('podcast') || cn.includes('interview') || cn.includes('shorts') || cn.includes('reels')) {
                         minPct = 0.05;
                     }
                 }
@@ -323,13 +323,28 @@ function onPlayerStateChange(event) {
 
         // INTERNAL CATEGORY RESOLUTION (For internal state tracking)
         if (currentVideoId && VIDEO_CATEGORY_MAP[currentVideoId]) {
-            currentLoadedPlaylistId = (APP_CONFIG.categories.find(c => c.name === VIDEO_CATEGORY_MAP[currentVideoId]) || {}).id;
+            const matchedCat = VIDEO_CATEGORY_MAP[currentVideoId];
+            currentLoadedPlaylistId = (APP_CONFIG.categories.find(c => c.name === matchedCat) || {}).id;
+            
+            // Toggle Portrait Mode for Reels/Shorts
+            if (matchedCat === "reels/shorts") {
+                document.body.classList.add('is-portrait');
+            } else {
+                document.body.classList.remove('is-portrait');
+            }
         } 
         else if (categorySwitchPending) {
             const url = player.getVideoUrl();
             if (url && url.includes(intendedCategoryId)) {
                 categorySwitchPending = false;
                 currentLoadedPlaylistId = intendedCategoryId;
+                
+                const catObj = APP_CONFIG.categories.find(c => c.id === intendedCategoryId);
+                if (catObj && catObj.name === "reels/shorts") {
+                    document.body.classList.add('is-portrait');
+                } else {
+                    document.body.classList.remove('is-portrait');
+                }
             }
         } 
 
@@ -353,18 +368,24 @@ function playRandomVideo() {
     
     let targetCategory;
     if (activeCategoryIdx === -1) {
-        // Defined user weights: Podcasts 40, Vlogs 30, Dj 20, Music 10
+        const isMobile = window.innerWidth <= 768;
         const rand = Math.random() * 100;
-        let selectedCategoryName = "Podcasts/Interviews"; // Default fallback
+        let selectedCategoryName = "Podcasts/Interviews"; 
         
-        if (rand < 40) {
-            selectedCategoryName = "Podcasts/Interviews";
-        } else if (rand < 70) {
-            selectedCategoryName = "Vlogs";
-        } else if (rand < 90) {
-            selectedCategoryName = "Dj Sets";
+        if (isMobile) {
+            // Mobile distribution: 40% Shorts, 20% Podcasts, 20% Vlogs, 10% Dj, 10% Music
+            if (rand < 40) selectedCategoryName = "reels/shorts";
+            else if (rand < 60) selectedCategoryName = "Podcasts/Interviews";
+            else if (rand < 80) selectedCategoryName = "Vlogs";
+            else if (rand < 90) selectedCategoryName = "Dj Sets";
+            else selectedCategoryName = "Music";
         } else {
-            selectedCategoryName = "Music";
+            // Desktop distribution: 30% Podcasts, 25% Vlogs, 20% Dj, 10% Shorts, 15% Music
+            if (rand < 30) selectedCategoryName = "Podcasts/Interviews";
+            else if (rand < 55) selectedCategoryName = "Vlogs";
+            else if (rand < 75) selectedCategoryName = "Dj Sets";
+            else if (rand < 85) selectedCategoryName = "reels/shorts";
+            else selectedCategoryName = "Music";
         }
 
         // Find the category object from config
@@ -512,6 +533,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 player.mute();
                 document.getElementById('btn-mute').innerText = 'UNMUTE';
             }
+        }
+    });
+
+    // Video Prompt Modal Logic
+    const videoModal = document.getElementById('video-modal');
+    const infoBanner = document.getElementById('info-banner');
+    const modalYes = document.getElementById('modal-yes');
+    const modalNo = document.getElementById('modal-no');
+
+    const isMobile = () => window.innerWidth <= 768;
+
+    infoBanner.addEventListener('click', (e) => {
+        // Only trigger on mobile view
+        if (isMobile()) {
+            // Don't trigger if they clicked the 'FULL VIDEO' button itself (though it's hidden on mobile)
+            if (e.target.id === 'btn-open-video') return;
+            
+            videoModal.classList.remove('hidden');
+        }
+    });
+
+    modalYes.addEventListener('click', () => {
+        if(isPlayerReady) {
+            const videoData = player.getVideoData();
+            if(videoData && videoData.video_id) {
+                window.open('https://youtube.com/watch?v=' + videoData.video_id, '_blank');
+            }
+        }
+        videoModal.classList.add('hidden');
+    });
+
+    modalNo.addEventListener('click', () => {
+        videoModal.classList.add('hidden');
+    });
+
+    // Close modal if background clicked
+    videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+            videoModal.classList.add('hidden');
         }
     });
 });
