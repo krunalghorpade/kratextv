@@ -353,8 +353,23 @@ function playRandomVideo() {
     
     let targetCategory;
     if (activeCategoryIdx === -1) {
-        const rIndex = Math.floor(Math.random() * APP_CONFIG.categories.length);
-        targetCategory = APP_CONFIG.categories[rIndex];
+        // Defined user weights: Podcasts 40, Vlogs 30, Dj 20, Music 10
+        const rand = Math.random() * 100;
+        let selectedCategoryName = "Podcasts/Interviews"; // Default fallback
+        
+        if (rand < 40) {
+            selectedCategoryName = "Podcasts/Interviews";
+        } else if (rand < 70) {
+            selectedCategoryName = "Vlogs";
+        } else if (rand < 90) {
+            selectedCategoryName = "Dj Sets";
+        } else {
+            selectedCategoryName = "Music";
+        }
+
+        // Find the category object from config
+        targetCategory = APP_CONFIG.categories.find(cat => cat.name === selectedCategoryName);
+        if (!targetCategory) targetCategory = APP_CONFIG.categories[0];
     } else {
         targetCategory = APP_CONFIG.categories[activeCategoryIdx];
     }

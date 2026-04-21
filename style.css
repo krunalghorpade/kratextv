@@ -1184,6 +1184,6 @@ body.look-y2k *:not(i) {
     }
 }
 
-.mobile-only-btn {
-    display: none;
+.mobile-only, .mobile-only-btn {
+    display: none !important;
 }
