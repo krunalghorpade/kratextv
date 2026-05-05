@@ -269,8 +269,8 @@ function onPlayerStateChange(event) {
     if (currentVideoId && currentVideoId !== lastVideoId && (event.data === YT.PlayerState.BUFFERING || event.data === YT.PlayerState.PLAYING)) {
         lastVideoId = currentVideoId;
         
-        // 1. Lock screen with high-priority static
-        showStatic(3000); 
+        // 1. Lock screen with high-priority static (increased duration)
+        showStatic(4000); 
         
         // 2. Silence immediately to prevent 'start audio' leak
         try { player.mute(); } catch(e) {}
@@ -352,7 +352,8 @@ function onPlayerStateChange(event) {
     }
     
     if (event.data === YT.PlayerState.ENDED) {
-        // playlist natural flow...
+        // Automatically play next random video when current one ends
+        playRandomVideo();
     }
 }
 
@@ -361,7 +362,7 @@ function onPlayerError(event) {
     setTimeout(() => playRandomVideo(), 2000);
 }
 
-function playRandomVideo() {
+async function playRandomVideo() {
     if(!isPlayerReady || APP_CONFIG.categories.length === 0) return;
     
     showStatic(1200);
@@ -403,13 +404,27 @@ function playRandomVideo() {
     document.getElementById('video-desc').innerText = "Retuning frequencies...";
     wakeUpHUD();
     
-    // isSeekingToRandom logic handled globally by lastVideoId tracker now
-    player.loadPlaylist({
-        list: targetCategory.id,
-        listType: 'playlist',
-        index: Math.floor(Math.random() * 20), // Start at a random video in the list
-        suggestedQuality: 'hd1080'
-    });
+    // Show static immediately and for longer to cover the fetch/load gap
+    showStatic(5000);
+    
+    // Get videos from cache or fetch them
+    let videos = PLAYLIST_CACHE[targetCategory.id];
+    if (!videos || videos.length === 0) {
+        videos = await getPlaylistItems(targetCategory.id, targetCategory.name);
+    }
+
+    if (videos && videos.length > 0) {
+        const randomVideoId = videos[Math.floor(Math.random() * videos.length)];
+        player.loadVideoById(randomVideoId);
+    } else {
+        // Fallback to loadPlaylist if something went wrong with fetching individual IDs
+        player.loadPlaylist({
+            list: targetCategory.id,
+            listType: 'playlist',
+            index: Math.floor(Math.random() * 20),
+            suggestedQuality: 'hd1080'
+        });
+    }
 }
 
 // Attach Event Listeners
@@ -495,14 +510,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.getElementById('btn-ch-prev').addEventListener('click', () => {
-        playRandomVideo();
-    });
-
-    document.getElementById('btn-ch-prev-mobile').addEventListener('click', () => {
-        playRandomVideo();
-    });
-    
-    document.getElementById('btn-ch-next-mobile').addEventListener('click', () => {
         playRandomVideo();
     });
     

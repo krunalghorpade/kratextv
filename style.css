@@ -57,7 +57,7 @@ html {
             rgba(0, 0, 0, 0.15) 50%,
             rgba(0, 0, 0, 0.15));
     background-size: 100% 4px;
-    z-index: 10;
+    z-index: 80;
     pointer-events: none;
     opacity: 0.8;
     display: none;
@@ -70,7 +70,7 @@ html {
     width: 100vw;
     height: 100vh;
     background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.15%22/%3E%3C/svg%3E');
-    z-index: 6;
+    z-index: 75;
     pointer-events: none;
     display: none;
 }
@@ -84,7 +84,7 @@ html {
     box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
     background: linear-gradient(rgba(255, 0, 0, 0.05) 0%, rgba(0, 255, 0, 0.02) 50%, rgba(0, 0, 255, 0.05) 100%);
     mix-blend-mode: screen;
-    z-index: 5;
+    z-index: 70;
     pointer-events: none;
     animation: vhs-rgb 3s infinite linear;
     display: none;
@@ -272,7 +272,7 @@ body.look-y2k *:not(i) {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 500;
+    z-index: 50;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.1s ease;
@@ -833,7 +833,7 @@ body.look-y2k *:not(i) {
     text-transform: uppercase;
 }
 
-.landing-description strong {
+.landing-description h1 {
     font-size: 32px;
     display: block;
     margin-bottom: 8px;
@@ -1042,7 +1042,7 @@ body.look-y2k *:not(i) {
         margin-bottom: 20px;
     }
 
-    .landing-description strong {
+    .landing-description h1 {
         font-size: 20px;
         margin-bottom: 8px;
     }
@@ -1173,7 +1173,7 @@ body.look-y2k *:not(i) {
     body.look-y2k #player,
     body.look-bw #player,
     body.look-clean #player {
-        transform: translate(-50%, -50%) scale(1.4) !important;
+        transform: translate(-50%, -50%) scale(1.6) !important;
     }
 }
 
