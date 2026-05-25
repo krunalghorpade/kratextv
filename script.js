@@ -132,11 +132,34 @@ document.addEventListener('touchend', e => {
     const touchEndY = e.changedTouches[0].screenY;
     const diff = touchStartY - touchEndY;
     
-    // Threshold of 50px for a swipe
-    if (Math.abs(diff) > 50) {
-        playRandomVideo();
+    // Threshold of 50px for a swipe UP (diff > 50)
+    if (diff > 50) {
+        triggerSlideTransition();
     }
 }, {passive: true});
+
+async function triggerSlideTransition() {
+    const playerContainer = document.getElementById('player-container');
+    
+    // 1. Slide current out UP
+    playerContainer.classList.add('slide-up-out');
+    
+    // 2. Wait for slide out, then load next video and snap container to bottom
+    setTimeout(async () => {
+        // Change video
+        await playRandomVideo();
+        
+        // Snap to bottom (transition: none)
+        playerContainer.classList.remove('slide-up-out');
+        playerContainer.classList.add('slide-up-in');
+        
+        // Force reflow
+        void playerContainer.offsetWidth;
+        
+        // 3. Slide in from bottom
+        playerContainer.classList.remove('slide-up-in');
+    }, 400); // Matches transition duration roughly
+}
 
 resizeCanvas();
 
@@ -269,7 +292,8 @@ function onPlayerStateChange(event) {
     if (currentVideoId && currentVideoId !== lastVideoId && (event.data === YT.PlayerState.BUFFERING || event.data === YT.PlayerState.PLAYING)) {
         lastVideoId = currentVideoId;
         
-        // 1. Lock screen with high-priority static (increased duration)
+        // 1. Activate solid cover + static to block ALL YouTube UI
+        document.getElementById('player-cover').classList.add('active');
         showStatic(4000); 
         
         // 2. Silence immediately to prevent 'start audio' leak
@@ -299,8 +323,9 @@ function onPlayerStateChange(event) {
                         player.unMute();
                         player.setVolume(100);
                         showStatic(10); // Clear static immediately
+                        document.getElementById('player-cover').classList.remove('active');
                     } catch(e) {}
-                }, 600);
+                }, 800);
             }
         }, 50);
     }
@@ -404,7 +429,8 @@ async function playRandomVideo() {
     document.getElementById('video-desc').innerText = "Retuning frequencies...";
     wakeUpHUD();
     
-    // Show static immediately and for longer to cover the fetch/load gap
+    // Show cover + static immediately to block YouTube UI
+    document.getElementById('player-cover').classList.add('active');
     showStatic(5000);
     
     // Get videos from cache or fetch them
@@ -438,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(isPlayerReady && APP_CONFIG.categories.length > 0) {
             startTV();
         } else {
-            document.querySelector('#btn-power div').innerText = "CONNECTING...";
+            document.querySelector('.power-label').innerText = "CONNECTING...";
         }
     });
     
@@ -453,7 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(isPlayerReady) player.pauseVideo();
         document.getElementById('power-screen').classList.remove('hidden');
         document.getElementById('remote-box').classList.add('hidden');
-        document.querySelector('#btn-power div').innerText = "POWER ON";
+        document.querySelector('.power-label').innerText = "TURN ON";
     };
 
     document.getElementById('btn-power-off').addEventListener('click', handlePowerOff);

@@ -37,12 +37,40 @@ html {
     height: 100vh;
     pointer-events: none;
     z-index: 1;
+    overflow: hidden;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-up-out {
+    transform: translateY(-100%) !important;
+}
+
+.slide-up-in {
+    transform: translateY(100%) !important;
+    transition: none !important;
+}
+
+.player-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.player-cover.active {
+    opacity: 1;
 }
 
 #player {
     width: 100vw;
     height: 100vh;
-    transform: scale(1.2);
+    transform: scale(1.35);
 }
 
 .scanlines {
@@ -106,7 +134,7 @@ html {
 
 /* Look: Clean */
 body.look-clean #player {
-    transform: scale(1.0) !important;
+    transform: scale(1.35) !important;
     filter: none;
 }
 
@@ -654,25 +682,43 @@ body.look-y2k *:not(i) {
 }
 
 .power-btn {
-    background: radial-gradient(circle at 30% 30%, #1a2233 0%, #080c16 100%);
-    border: 8px solid #0d121f;
+    background: radial-gradient(circle at 40% 35%, #0a3d1a 0%, #041a0a 100%);
+    border: 4px solid #00ff66;
     color: #fff;
     border-radius: 50%;
     cursor: pointer;
     box-shadow:
-        0 20px 40px rgba(0, 0, 0, 0.8),
-        inset 0 1px 2px rgba(255, 255, 255, 0.1),
-        0 0 0 2px #05080f;
+        0 0 20px rgba(0, 255, 102, 0.4),
+        0 0 50px rgba(0, 255, 102, 0.2),
+        0 0 80px rgba(0, 255, 102, 0.1),
+        inset 0 0 20px rgba(0, 255, 102, 0.1);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 145px;
-    height: 145px;
+    width: 120px;
+    height: 120px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
     position: relative;
     overflow: hidden;
+    animation: power-breathe 3s ease-in-out infinite;
+}
+
+@keyframes power-breathe {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(0, 255, 102, 0.4),
+            0 0 50px rgba(0, 255, 102, 0.2),
+            0 0 80px rgba(0, 255, 102, 0.1),
+            inset 0 0 20px rgba(0, 255, 102, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(0, 255, 102, 0.6),
+            0 0 70px rgba(0, 255, 102, 0.3),
+            0 0 110px rgba(0, 255, 102, 0.15),
+            inset 0 0 30px rgba(0, 255, 102, 0.15);
+    }
 }
 
 /* Physical concentric ring texture */
@@ -690,11 +736,8 @@ body.look-y2k *:not(i) {
 }
 
 .power-symbol {
-    background: #04060b;
-    padding: 12px;
-    border-radius: 50%;
-    margin-bottom: 8px;
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), 1px 1px 1px rgba(255, 255, 255, 0.05);
+    padding: 0;
+    margin: 0;
     z-index: 2;
     display: flex;
     align-items: center;
@@ -703,58 +746,72 @@ body.look-y2k *:not(i) {
 }
 
 .power-symbol svg {
-    color: #2d3b52;
+    color: #00ff66;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 102, 0.7));
     transition: all 0.3s ease;
 }
 
 .power-label {
-    font-size: 10px;
+    display: block;
+    font-size: 13px;
     text-transform: uppercase;
     font-weight: 900;
-    letter-spacing: 2px;
-    color: #2d3b52;
-    z-index: 2;
+    letter-spacing: 4px;
+    color: #00ff66;
+    margin-top: 18px;
+    text-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
     transition: all 0.3s ease;
-    margin-bottom: 4px;
 }
 
 /* Hardware Status LED */
 .power-led {
-    width: 5px;
-    height: 5px;
+    display: block;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background: #3d0000;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
-    z-index: 2;
+    background: #00ff66;
+    box-shadow: 0 0 8px #00ff66, 0 0 16px rgba(0, 255, 102, 0.4);
+    margin-top: 12px;
     transition: all 0.3s ease;
+    animation: led-blink 2s ease-in-out infinite;
+}
+
+@keyframes led-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
 }
 
 .power-btn:hover {
-    border-color: #121929;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 1), 0 0 0 2px #05080f;
-}
-
-.power-btn:hover .power-symbol {
-    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 224, 255, 0.2);
+    border-color: #33ff88;
+    animation: none;
+    background: radial-gradient(circle at 40% 35%, #0f5222 0%, #041a0a 100%);
+    box-shadow:
+        0 0 35px rgba(0, 255, 102, 0.6),
+        0 0 80px rgba(0, 255, 102, 0.35),
+        0 0 140px rgba(0, 255, 102, 0.2),
+        inset 0 0 30px rgba(0, 255, 102, 0.2);
 }
 
 .power-btn:hover .power-symbol svg {
-    color: #00e0ff;
-    filter: drop-shadow(0 0 8px rgba(0, 224, 255, 0.6));
+    color: #33ff88;
+    filter: drop-shadow(0 0 18px rgba(0, 255, 102, 1));
 }
 
-.power-btn:hover .power-label {
+.power-core:hover .power-label {
     color: #ffffff;
+    text-shadow: 0 0 15px rgba(0, 255, 102, 0.6);
 }
 
-.power-btn:hover .power-led {
-    background: #ff0000;
-    box-shadow: 0 0 12px #ff0000, 0 0 20px rgba(255, 0, 0, 0.4);
+.power-core:hover .power-led {
+    background: #33ff88;
+    box-shadow: 0 0 15px #00ff66, 0 0 30px rgba(0, 255, 102, 0.6);
+    animation: none;
+    opacity: 1;
 }
 
 .power-btn:active {
-    transform: translateY(4px) scale(0.97);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 1), inset 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 0 2px #05080f;
+    transform: translateY(3px) scale(0.95);
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.3), inset 0 2px 10px rgba(0, 0, 0, 0.5);
     transition: all 0.1s ease;
 }
 
@@ -865,20 +922,10 @@ body.look-y2k *:not(i) {
 }
 
 .power-core {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 45px;
-}
-
-.power-btn span {
-    margin-top: 15px;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 3px;
-    color: #5d708a;
-    transition: all 0.3s ease;
-}
-
-.power-btn:hover span {
-    color: var(--accent);
 }
 
 .social-icon-grid {
@@ -949,6 +996,10 @@ body.look-y2k *:not(i) {
     font-size: 14px !important;
 }
 
+.mobile-only, .mobile-only-btn {
+    display: none !important;
+}
+
 /* ==========================================================================
    MOBILE RESPONSIVENESS
    ========================================================================== */
@@ -963,29 +1014,33 @@ body.look-y2k *:not(i) {
     }
 
     .swipe-hint {
-        position: absolute;
-        top: 20%;
-        left: 50%;
-        transform: translateX(-50%);
-        color: rgba(255, 255, 255, 0.4);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
-        pointer-events: none;
+        gap: 4px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 10px;
         z-index: 100;
-        animation: hint-fade 4s infinite;
+        pointer-events: none;
+        letter-spacing: 1px;
+        margin-top: 10px;
     }
 
-    .swipe-hint i {
-        font-size: 24px;
-        animation: swipe-move 1.5s infinite ease-in-out;
+    .swipe-arrow {
+        font-size: 14px;
+        animation: swipePulse 1.5s infinite;
+        color: var(--accent);
+    }
+
+    @keyframes swipePulse {
+        0% { transform: translateY(0); opacity: 0.5; }
+        50% { transform: translateY(-10px); opacity: 1; }
+        100% { transform: translateY(0); opacity: 0.5; }
     }
 
     .swipe-hint span {
-        font-size: 10px;
-        font-weight: 900;
-        letter-spacing: 2px;
+        font-weight: 700;
+        opacity: 0.7;
         text-transform: uppercase;
         text-align: center; /* Explicitly centered */
         width: 100%;
@@ -1177,9 +1232,7 @@ body.look-y2k *:not(i) {
     }
 }
 
-.mobile-only, .mobile-only-btn {
-    display: none !important;
-}
+
 
 /* Video Modal styles */
 .modal-overlay {
