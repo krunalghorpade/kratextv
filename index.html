@@ -1,248 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kratex TV | Official M-House Video Hub</title>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KT65ZSVNCY"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-KT65ZSVNCY');
-    </script>
-
-    <!-- Use Custom Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Anton&family=Barriecito&family=Dosis:wght@200..800&family=Special+Gothic+Condensed+One&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=2.1">
-
-    <!-- SEO & Social Media Meta Tags -->
-    <meta name="description"
-        content="Kratex TV - The official video hub for the pioneer of M-House. Watch exclusive live sets, global tour vlogs, and the pulse of Marathi culture taking over the world stage.">
-    <meta name="keywords"
-        content="Kratex, Kratex TV, M-House, Marathi House, DJ Sets, Vlogs, Podcasts, Marathi Culture, Electronic Music, India DJ">
-    <meta name="author" content="Kratex">
-    <meta name="robots" content="index, follow">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tv.kratex.in/">
-    <meta property="og:title" content="Kratex TV | Official M-House Video Hub">
-    <meta property="og:description"
-        content="Experience the pulse of M-House culture. Watch exclusive live sets, tour vlogs, and interviews from Kratex.">
-    <meta property="og:image" content="assets/images/tvthumb.gif">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://tv.kratex.in/">
-    <meta name="twitter:title" content="Kratex TV | Official M-House Video Hub">
-    <meta name="twitter:description"
-        content="Watch exclusive M-House sets and global vlogs on the official Kratex TV hub.">
-    <meta name="twitter:image" content="assets/images/tvthumb.gif">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101018">
+  <title>KRATEX TV — Tune in. Zone out.</title>
+  <meta name="description" content="Your little corner of M-House. Tune into Kratex's music, DJ sets, stories, and Marathi culture on a television from another time.">
+  <meta property="og:title" content="KRATEX TV — Tune in. Zone out."><meta property="og:description" content="Six channels. One room. All Kratex. Come hang out."><meta property="og:type" content="website"><meta property="og:url" content="https://tv.kratex.in/"><meta property="og:image" content="https://tv.kratex.in/assets/images/seo-image.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/assets/images/icon.png"><link rel="preload" href="/assets/fonts/vcr.ttf" as="font" type="font/ttf" crossorigin><link rel="stylesheet" href="/style.css"><script src="/script.js" type="module"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KT65ZSVNCY"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-KT65ZSVNCY');</script>
 </head>
-
-<body>
-    <!-- App Configuration will be loaded via JS -->
-
-    <div class="tv-container">
-        <!-- Power Screen (Fixes Autoplay block & Landing Page) -->
-        <div class="power-screen" id="power-screen">
-            <div class="landing-content">
-                <div class="tv-bezel">
-                    <img src="assets/images/tvlogo.png" alt="Kratex TV Logo" class="landing-logo">
-
-                    <div class="landing-description">
-                        <h1>WELCOME TO KRATEX TV</h1>
-                        The official video hub for the pioneer of M-House. Watch exclusive live sets, global tour vlogs,
-                        and the pulse of Marathi culture taking over the world stage.
-                    </div>
-
-                    <!-- Primary Quick Links -->
-                    <div class="primary-links">
-                        <a href="https://shows.kratex.in" target="_blank">SHOWS</a>
-                        <a href="https://whatsapp.com/channel/0029VaA3LelAu3aMHcTdIY16" target="_blank">COMMUNITY</a>
-                        <a href="https://shop.kratex.in" target="_blank">MERCH</a>
-                        <a href="https://kratex.in" target="_blank">OFFICIAL SITE</a>
-                    </div>
-
-                    <!-- Centered Power Button Core -->
-                    <div class="power-core">
-                        <button class="power-btn" id="btn-power">
-                            <div class="power-symbol">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                    stroke-linejoin="round">
-                                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
-                                    <line x1="12" y1="2" x2="12" y2="12"></line>
-                                </svg>
-                            </div>
-                        </button>
-                        <span class="power-label">TURN ON</span>
-                        <span class="power-led"></span>
-                    </div>
-
-                    <!-- Minimal Icon Socials/Music -->
-                    <div class="social-icon-grid">
-                        <!-- Socials -->
-                        <a href="https://instagram.com/kratexmusic" target="_blank" title="Instagram"><i
-                                class="fa-brands fa-instagram"></i></a>
-                        <a href="https://youtube.com/@Kratexmusic" target="_blank" title="YouTube"><i
-                                class="fa-brands fa-youtube"></i></a>
-                        <a href="https://twitter.com/kratexmusic" target="_blank" title="X / Twitter"><i
-                                class="fa-brands fa-x-twitter"></i></a>
-                        <a href="https://facebook.com/kratexmusic" target="_blank" title="Facebook"><i
-                                class="fa-brands fa-facebook"></i></a>
-
-                        <div class="divider"></div>
-
-                        <!-- Music -->
-                        <a href="https://open.spotify.com/artist/3Gowc3dedLQgQAt4y0gPBo?si=99w7T70hSf6zeVfB7CGbxA"
-                            target="_blank" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                        <a href="https://music.apple.com/nz/artist/kratex/1054012287" target="_blank"
-                            title="Apple Music"><i class="fa-brands fa-apple"></i></a>
-                        <a href="https://music.amazon.com/artists/B0185OP69C/kratex?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_2dZwcBaq23nW3JCi5CtkZFC2C"
-                            target="_blank" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                        <a href="https://kratex.bandcamp.com/" target="_blank" title="Bandcamp"><i
-                                class="fa-brands fa-bandcamp"></i></a>
-                        <a href="https://www.beatport.com/artist/kratex/517636" target="_blank" title="Beatport"><i
-                                class="fa-solid fa-compact-disc"></i></a>
-                        <a href="https://www.jiosaavn.com/artist/kratex-songs/lTbOhjmKg5M_" target="_blank"
-                            title="JioSaavn"><i class="fa-solid fa-music"></i></a>
-                    </div>
+<body data-theme="night" data-look="y2k">
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9M6.3 5.7a9 9 0 1 0 11.4 0"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14a9 9 0 0 1-10.5-10.5A9 9 0 1 0 20.5 14Z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7Z"/></symbol><symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="m5 5 10 7-10 7ZM19 5v14"/></symbol><symbol id="i-prev" viewBox="0 0 24 24"><path d="m19 5-10 7 10 7ZM5 5v14"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5ZM15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol><symbol id="i-mute" viewBox="0 0 24 24"><path d="M11 4 5 9H2v6h3l6 5ZM16 9l6 6m0-6-6 6"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></symbol><symbol id="i-remote" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M10 6h4m-4 5h.01M14 11h.01M10 15h.01M14 15h.01M10 18h4"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol><symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5Z"/></symbol><symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+  </svg>
+  <a class="skip-link" href="#channel-section">Skip to channels</a>
+  <div class="site-shell">
+    <header class="site-header">
+      <a href="/" class="brand" aria-label="Kratex TV home"><img src="/assets/images/tvlogo.png" alt="KRATEX TV"><span class="brand-edition">EST. IN A DIFFERENT ERA</span></a>
+      <nav class="header-links" aria-label="Main navigation"><a href="#channel-section">The channels <span>06</span></a><a href="https://kratex.in" target="_blank" rel="noopener noreferrer">The artist <svg class="icon"><use href="#i-external"/></svg></a></nav>
+      <button id="theme-switch" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Day mode"><span class="theme-icon"><svg class="icon"><use href="#i-moon"/></svg></span><span id="theme-label">Night room</span><span class="switch-track"><span></span></span></button>
+    </header>
+    <main>
+      <section class="living-room" aria-labelledby="room-title">
+        <div class="room-intro"><span class="tiny-label"><span class="status-dot"></span> YOUR PRIVATE FREQUENCY</span><h1 id="room-title">Tune in. <em>Zone out.</em></h1><p>Leave the world outside. There’s something good on.</p></div>
+        <div class="room" id="room">
+          <div class="wall-glow" aria-hidden="true"></div><div class="floor" aria-hidden="true"></div>
+          <div class="poster" aria-hidden="true"><div class="poster-top">SOUND FROM THE STREETS<br>STRAIGHT TO YOUR ROOM.</div><span class="poster-title">M<br>HOUSE<span>™</span></span><svg viewBox="0 0 100 100"><path d="M50 0 59 37 85 15 63 42 100 50 63 59 85 85 59 63 50 100 42 63 15 85 37 59 0 50 37 42 15 15 42 37Z" fill="currentColor"/></svg><span class="poster-bottom">MARATHI ROOTS. GLOBAL FREQUENCY.</span></div>
+          <div class="room-window" aria-hidden="true"><div class="window-sky"><div class="stars"></div><div class="celestial-body"></div><div class="skyline"></div></div><div class="window-cross"></div><div class="window-sill"></div></div><div class="window-light" aria-hidden="true"></div>
+          <div class="lamp" aria-hidden="true"><div class="lamp-aura"></div><div class="lamp-shade"></div><div class="lamp-stem"></div><div class="lamp-base"></div></div><div class="side-table" aria-hidden="true"><div class="table-top"></div><div class="table-leg"></div></div>
+          <div class="setup">
+            <div class="tv-aura" aria-hidden="true"></div>
+            <div class="television" id="television">
+              <div class="top-vents" aria-hidden="true"></div>
+              <div class="screen-surround"><div class="screen" id="screen" aria-label="Kratex television screen">
+                <div id="player-container"><div id="player"></div></div>
+                <div class="standby-screen" id="standby-screen">
+                  <video class="standby-video" id="standby-video" autoplay muted loop playsinline preload="metadata" poster="/assets/images/seo-image.png" aria-hidden="true"><source src="/assets/videos/tvthumb.mp4" type="video/mp4"></video><div class="standby-shade"></div>
+                  <div class="screen-corner"><span>AV 1</span><span>STEREO</span></div>
+                  <div class="standby-content"><span class="screen-eyebrow">YOU’RE RIGHT ON TIME.</span><div class="screen-wordmark" aria-hidden="true">KRATEX<span>TV</span><svg class="screen-star icon"><use href="#i-spark"/></svg></div><p>A little music. A little madness. All us.</p><button class="watch-button" id="watch-button" type="button"><svg class="icon"><use href="#i-power"/></svg> Switch on <span>↗</span></button></div>
+                  <div class="screen-bottom"><span>6 CHANNELS. ENDLESS GOOD VIBES.</span><span class="screen-clock" id="screen-clock">00:00</span></div>
                 </div>
+                <div class="screen-message" id="screen-message" hidden><span class="message-glyph" aria-hidden="true">✳</span><h2 id="message-title">Finding your frequency…</h2><p id="message-detail">Connecting to your channel.</p><div class="message-actions"><button type="button" id="retry-button" hidden>Try again</button><button type="button" id="resume-button" hidden>Play channel</button><button type="button" id="message-next-channel" data-action="channel-next" hidden>Next channel</button></div></div>
+                <div class="screen-glass" aria-hidden="true"></div><div class="scanlines" aria-hidden="true"></div><div class="tuning-static" id="tuning-static" aria-hidden="true"></div><div class="screen-osd" id="screen-osd" aria-live="polite"></div>
+              </div></div>
+              <div class="tv-chin"><div class="speaker-grille" aria-hidden="true"></div><div class="tv-manufacturer"><strong>KRATEX<span>®</span></strong><div class="vhs-slot" aria-hidden="true"></div><span>HI-FI STEREO <b>VHS</b></span></div><div class="hardware-controls"><span class="hardware-label">CHANNEL</span><div><button type="button" data-action="channel-prev" aria-label="Previous channel">−</button><button type="button" data-action="channel-next" aria-label="Next channel">+</button></div></div><div class="hardware-power"><button id="tv-power" type="button" data-action="power" aria-label="Turn television on" aria-pressed="false"><svg class="icon"><use href="#i-power"/></svg></button><span><i id="power-led"></i> POWER</span></div></div><div class="tv-feet" aria-hidden="true"></div>
             </div>
+            <div class="cabinet" aria-hidden="true"><div class="cabinet-top"></div><div class="cabinet-body"><div class="vinyls"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="receiver"><span>KR—2000</span><div class="receiver-display">M-HOUSE FM</div><i></i></div><div class="tapes"><span>AFTER HOURS / VOL. 01</span><span>KRATEX — THE GOOD STUFF</span></div></div><div class="cabinet-feet"></div></div>
+          </div>
+          <div class="room-note"><span class="note-star">✳</span><span>make yourself<br>at home.</span></div><div class="room-coordinate" aria-hidden="true">19.0760° N &nbsp; 72.8777° E<br><span>FROM MUMBAI, WITH LOVE.</span></div>
         </div>
-        <!-- YouTube Player Container -->
-        <div id="player-container">
-            <div id="player"></div>
-            <div id="player-cover" class="player-cover active"></div>
-        </div>
-
-        <!-- Look Overlays -->
-        <div class="scanlines"></div>
-        <div class="noise-overlay"></div>
-        <div class="vhs-filter"></div>
-
-        <!-- TV Static Overlay -->
-        <canvas id="tv-static"></canvas>
-
-        <!-- TV Overlay (HUD) -->
-        <div class="tv-hud" id="hud">
-
-            <!-- Main Top Right Logo -->
-            <div class="logo">
-                <img src="assets/images/tvlogo.png" alt="Kratex TV">
-                <!-- Mobile Swipe Hint -->
-                <div class="swipe-hint mobile-only">
-                    <div class="swipe-arrow">
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </div>
-                    <span>SWIPE UP FOR NEXT CH</span>
-                </div>
-            </div>
-
-            <!-- Program Info Banner (Satellite TV style) -->
-            <div class="info-banner hidden retro-info-banner" id="info-banner">
-                <div class="program-details retro-details">
-                    <div class="program-header">
-                        <span class="program-title" id="video-title">Initializing signal...</span>
-                    </div>
-                    <div class="program-desc" id="video-desc">No description data transmitted.</div>
-                    <div class="program-tags">
-                    </div>
-                </div>
-                <button id="btn-open-video" class="open-video-btn retro-btn" title="Open Video in YouTube">FULL
-                    VIDEO</button>
-            </div>
-
-            <!-- Keyboard Hints -->
-            <div class="keyboard-hints desktop-only">
-                [ ◀ ▶ ] CH &nbsp; [ ▲ ▼ ] VOL &nbsp; [ F ] FULL &nbsp; [ L ] LOOK
-            </div>
-
-            <!-- Floating Actions -->
-            <div class="floating-actions">
-                <div id="btn-power-off-floating" class="floating-btn" title="Power Off TV">
-                    <i class="fa-solid fa-power-off"></i>
-                </div>
-                <div id="btn-fullscreen-toggle" class="floating-btn" title="Toggle Fullscreen">
-                    <i class="fa-solid fa-expand"></i>
-                </div>
-                <div id="btn-remote-toggle" class="floating-btn" title="Toggle Remote">
-                    <i class="fa-solid fa-gamepad"></i>
-                </div>
-            </div>
-
-            <!-- Remote Controls (Overlay buttons) -->
-            <div class="remote-controls hidden" id="remote-box">
-
-                <div class="remote-section-title">Power/Mode</div>
-                <div class="tv-controls">
-                    <button id="btn-power-off" class="remote-btn minimal-btn" title="Power Off TV">OFF</button>
-                </div>
-
-                <div class="remote-section-title">Look</div>
-                <div class="tv-controls">
-                    <button id="btn-look-toggle" class="remote-btn minimal-btn" title="Toggle Look">LOOK: RETRO</button>
-                </div>
-
-                <div class="remote-section-title">Volume</div>
-                <div class="volume-controls minimal-controls-box">
-                    <button id="btn-vol-up" class="remote-btn minimal-btn" title="Volume Up">VOL +</button>
-                    <button id="btn-vol-down" class="remote-btn minimal-btn" title="Volume Down">VOL -</button>
-                    <button id="btn-mute" class="remote-btn minimal-btn" title="Mute">MUTE</button>
-                </div>
-
-                <div class="remote-section-title">Channel</div>
-                <div class="channel-controls minimal-controls-box">
-                    <button id="btn-ch-prev" class="remote-btn minimal-btn" title="Previous Channel">CH PREV</button>
-                    <button id="btn-ch-next" class="remote-btn minimal-btn" title="Next Channel">CH NEXT</button>
-                </div>
-            </div>
-
-            <!-- Marquee Ticker at the bottom -->
-            <div class="ticker-container" id="ticker-container">
-                <div class="ticker-content" id="ticker-content">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Video Prompt Modal -->
-        <div id="video-modal" class="modal-overlay hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <img src="assets/images/tvlogo.png" alt="Kratex TV" class="modal-logo">
-                </div>
-                <div class="modal-body">
-                    <h3>WATCH FULL VIDEO?</h3>
-                    <p>Do you want to switch to the original video on YouTube?</p>
-                </div>
-                <div class="modal-footer">
-                    <button id="modal-yes" class="modal-btn yes-btn">YES</button>
-                    <button id="modal-no" class="modal-btn no-btn">NO</button>
-                </div>
-            </div>
-        </div>
+        <div class="playback-strip"><div class="now-playing"><span class="signal-bars" id="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span><div><span class="tiny-label" id="playback-status">READY WHEN YOU ARE</span><p id="program-title">Your front-row seat to the world of Kratex.</p></div></div><div class="playback-actions"><span class="look-indicator" id="look-indicator">Y2K PICTURE</span><button type="button" data-action="look" class="icon-button" aria-label="Change picture style" title="Picture style (L)"><svg class="icon"><use href="#i-spark"/></svg></button><button type="button" data-action="fullscreen" class="icon-button" aria-label="Fullscreen television" title="Fullscreen (F)"><svg class="icon"><use href="#i-expand"/></svg></button></div></div>
+      </section>
+      <section class="channel-section" id="channel-section" aria-labelledby="channels-title"><div class="section-heading"><h2 id="channels-title">Pick your frequency<span id="channel-count"> / 06</span></h2><span>LESS SCROLLING. MORE TUNING IN.</span></div><div class="channel-grid" id="channel-grid" aria-label="TV channels"><p class="config-loading">Loading your channels…</p></div><p class="channel-help">Press <kbd>←</kbd> <kbd>→</kbd> to channel surf <span>·</span> Or grab the remote <span class="help-arrow">↘</span></p></section>
+    </main>
+    <footer class="site-footer"><span class="footer-signoff"><svg class="icon"><use href="#i-spark"/></svg> Marathi roots. Global frequency.</span><nav aria-label="Kratex links"><a href="https://shows.kratex.in" target="_blank" rel="noopener noreferrer">Shows ↗</a><a href="https://shop.kratex.in" target="_blank" rel="noopener noreferrer">Merch ↗</a><a href="https://whatsapp.com/channel/0029VaA3LelAu3aMHcTdIY16" target="_blank" rel="noopener noreferrer">Community ↗</a><a href="https://www.buymeacoffee.com/kratexmusic" target="_blank" rel="noopener noreferrer">Buy a coffee ↗</a></nav><button class="shortcuts-button" id="shortcuts-button" type="button" aria-label="Show keyboard shortcuts">?</button></footer>
+  </div>
+  <aside class="remote-dock" id="remote-dock" aria-label="Television remote">
+    <button class="remote-toggle" id="remote-toggle" type="button" aria-expanded="false" aria-controls="remote"><svg class="icon"><use href="#i-remote"/></svg><span>Remote</span><span class="remote-toggle-indicator">↗</span></button>
+    <div class="remote" id="remote" inert>
+      <div class="remote-top"><span>KRATEX<span>®</span></span><button type="button" data-action="power" class="remote-power" aria-label="Toggle television power"><svg class="icon"><use href="#i-power"/></svg></button></div>
+      <div class="remote-display"><span id="remote-channel">CH 03</span><span id="remote-display-name">DJ SETS</span><div><span id="remote-volume">VOL 60</span><i id="remote-led"></i></div></div>
+      <div class="remote-pair"><button type="button" data-action="mute" id="mute-button" aria-label="Mute sound" aria-pressed="false"><svg class="icon"><use href="#i-volume"/></svg><span id="mute-label">MUTE</span></button><button type="button" data-action="look" aria-label="Change picture style"><svg class="icon"><use href="#i-spark"/></svg><span>PICTURE</span></button></div>
+      <div class="remote-rockers"><div><button type="button" data-action="volume-up" aria-label="Volume up">+</button><span>VOL</span><button type="button" data-action="volume-down" aria-label="Volume down">−</button></div><div><button type="button" data-action="channel-next" aria-label="Next channel">⌃</button><span>CH</span><button type="button" data-action="channel-prev" aria-label="Previous channel">⌄</button></div></div>
+      <div class="remote-transport"><button type="button" data-action="program-prev" aria-label="Previous video"><svg class="icon"><use href="#i-prev"/></svg></button><button type="button" data-action="play" id="play-button" aria-label="Play video"><svg class="icon"><use href="#i-play"/></svg></button><button type="button" data-action="program-next" aria-label="Next video"><svg class="icon"><use href="#i-next"/></svg></button></div>
+      <div class="remote-numbers" id="remote-numbers" aria-label="Channel numbers"></div><div class="remote-pair remote-bottom"><button type="button" data-action="guide"><svg class="icon"><use href="#i-grid"/></svg><span>GUIDE</span></button><button type="button" data-action="fullscreen"><svg class="icon"><use href="#i-expand"/></svg><span>FULL</span></button></div><span class="remote-model">UNIVERSAL REMOTE · KT–06</span>
     </div>
-
-    <!-- YouTube IFrame API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="script.js"></script>
-
-    <!-- Buy Me A Coffee Widget -->
-    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
-        data-id="kratexmusic" data-description="Support me on Buy me a coffee!" data-message="Support here"
-        data-color="#40DCA5" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+  </aside>
+  <dialog class="shortcuts-dialog" id="shortcuts-dialog"><div class="dialog-heading"><h2>A few handy shortcuts</h2><button type="button" id="close-shortcuts" class="icon-button" aria-label="Close keyboard shortcuts"><svg class="icon"><use href="#i-close"/></svg></button></div><p>Stay on the sofa. We’ve got you.</p><dl><div><dt>Change channel</dt><dd>← / →</dd></div><div><dt>Volume</dt><dd>↑ / ↓</dd></div><div><dt>Play / pause</dt><dd>Space</dd></div><div><dt>Power / mute</dt><dd>P / M</dd></div><div><dt>Picture / fullscreen</dt><dd>L / F</dd></div><div><dt>Remote / day & night</dt><dd>R / D</dd></div><div><dt>Jump to channel</dt><dd>1 – 6</dd></div></dl></dialog>
+  <div class="sr-only" id="announcement" role="status" aria-live="polite"></div><noscript><p class="noscript">Turn on JavaScript to use the television, or <a href="https://youtube.com/@Kratexmusic">watch Kratex on YouTube</a>.</p></noscript>
 </body>
-
 </html>

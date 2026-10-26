@@ -1,79 +1,91 @@
-# KRATEX TV: The Future of M-House Broadcasting
+# KRATEX TV
 
-KRATEX TV is a revolutionary, high-fidelity web application designed to transform a YouTube content library into a fully immersive, "lean-back" television experience. Built with a premium retro/VHS aesthetic, it bridges the gap between modern digital content and the nostalgic comfort of traditional linear broadcasting.
+A CRT television in a little room, with six channels of Kratex. Built with Node.js and browser-native HTML, CSS, and JavaScript. No dependencies, API keys, or build step.
 
----
+## Run
 
-## 📺 Feature Suite
+Requires Node.js 22 or newer.
 
-### 1. Retro Aesthetic Engine
-*   **VHS Filter System**: Real-time scanlines, chroma noise, and vintage color grading.
-*   **Look Modes**: Toggle between four distinct visual identities:
-    *   **Y2K (Default)**: High-contrast, vibrant tech-nostalgia.
-    *   **Retro**: Warm, sepia-toned classic tube TV vibe.
-    *   **Clean**: Sharp, modern high-definition viewing.
-    *   **BW Nostalgia**: Grayscale with a subtle frame shake for a 1950s broadcast feel.
-*   **TV Static Transitions**: Realistic analog noise during channel switching to preserve the immersion.
+```sh
+npm run dev
+```
 
-### 2. Intelligent Content Distribution
-*   **Weighted Programming**: The TV doesn't just play randomly; it follows a calculated content strategy:
-    *   40% Podcasts/Interviews
-    *   30% Vlogs
-    *   20% DJ Sets
-    *   10% Music
-*   **Smart Seeking**: To simulate "tuning into a live broadcast," videos start at a random point in their duration, ensuring you never feel like you're just watching a playlist from the beginning.
-*   **Satellite HUD**: A futuristic Head-Up Display that provides real-time metadata (Title, Year, Description) on every video change.
+Open **http://127.0.0.1:3000**. Refresh the browser after editing front-end files. Restart the server after changing `server.mjs`.
 
-### 3. Interactive Controls
-*   **Virtual Remote**: An overlay control panel for volume, look toggles, and power.
-*   **Keyboard Shortcuts**: Advanced navigation for desktop power users ([◀ ▶] Channels, [▲ ▼] Volume, [F] Fullscreen, [L] Look).
-*   **Dynamic Ticker**: A bottom-scrolling marquee for announcements, community links, and "Breaking News."
+```sh
+npm start           # Same lightweight server, for regular use
+npm run check       # JavaScript syntax checks
+npm test            # Playback races, playlist membership, random starts, HTTP and media checks
+npm run sync:channels # Refresh the videos in all six configured playlists
+```
 
-### 4. Optimized Mobile Experience
-*   **4:3 Aspect Ratio**: Automatically switches to a classic CRT aspect ratio on mobile for authentic vibes.
-*   **Gesture Navigation**: Vertical swipe gestures to change channels.
-*   **Watch Full Video Prompt**: A custom-designed modal that allows users to seamlessly transition from the "TV" experience to the original YouTube video for comments and interaction.
+To use a different port or listen outside localhost:
 
----
+```sh
+HOST=0.0.0.0 PORT=8080 npm start
+```
 
-## 🎥 Content Programming
+For production, run behind an HTTPS reverse proxy with a Node process manager. This checkout has not been deployed by the redesign.
 
-Kratex TV currently broadcasts a curated selection of Marathi culture and electronic music content, categorized into five primary channels:
+## Experience
 
-1.  **Podcasts/Interviews**: Deep dives into the minds behind the M-House movement.
-2.  **Vlogs**: Behind-the-scenes global tour footage and lifestyle content.
-3.  **DJ Sets**: High-energy live performances from stages worldwide.
-4.  **reels/shorts**: High-impact, vertical-first short-form content.
-5.  **Music**: Official music videos and audio tracks.
-6.  **Nusta Vibes**: A dedicated channel for culture and community-driven content.
+- A CSS-built CRT, record cabinet, poster, lamp, and window. Video stays inside the TV aperture; the remote provides the controls.
+- Night by default, with a day/night switch that changes the room's lighting, sky, sun/moon, and colors.
+- Hover over **Remote** to reveal it; click or tap to keep it open. Click outside or press Escape to dismiss it.
+- Power, six channel buttons, previous/next video, play/pause, volume, mute, picture modes, channel guide, and fullscreen.
+- Y2K, clean, VHS, and black-and-white picture modes.
+- Responsive phone layouts, semantic buttons, keyboard navigation, reduced-motion support, and saved room/audio/picture/channel preferences.
+- The local teaser is muted. YouTube loads only after the visitor switches on or selects a channel. Failed connections, unavailable embeds, and blocked autoplay have recovery controls.
 
----
+## Channels
 
-## 🚀 Benefits for Creators (Podcasters, Vloggers, & Artists)
+`config.json` retains the six existing playlist IDs and order. Edit the name or ID to change a channel:
 
-Kratex TV isn't just a player; it's a **Career-Building Brand Asset**. Here’s how it helps creators:
+```json
+{
+  "channels": [
+    { "name": "Music", "id": "PL_YOUR_YOUTUBE_PLAYLIST_ID" }
+  ]
+}
+```
 
-### 1. Solving "Decision Fatigue"
-The biggest hurdle for large channels is that fans don't know where to start. Kratex TV removes the choice, allowing fans to keep the content running in the background, significantly increasing total **Watch Time**.
+The first visit selects DJ sets; later visits restore the selected channel. `channel-catalog.json` holds verified playlist members. After editing playlist IDs or adding videos on YouTube, run `npm run sync:channels`. The sync follows playlist pagination, handles Shorts, excludes recommendations, and replaces the catalog only when every playlist has loaded successfully. No API key or LemnosLife proxy is required.
 
-### 2. Back-Catalog Monetization
-YouTube's algorithm prioritizes new uploads, often burying older gems. Kratex TV’s randomized broadcasting resurfaces your "evergreen" content, giving old videos new life and passive ad revenue.
+Each channel switch selects a random member of that channel and a random point before its ending. Next video does the same, avoiding an immediate repeat; previous video uses the channel's playback history. Shorts with unknown duration are sought once their duration becomes available. A fresh player and request token isolate every switch, so late events from an old channel cannot show the wrong video. The picture is revealed only after the selected video is playing at its chosen point. Unavailable embeds retry other members of the same channel, up to five attempts.
 
-### 3. Elevated Brand Authority
-Having your own "TV Station" establishes you as a media network rather than just an uploader. This high-production-value presentation is a major selling point for **Sponsors** and **Brand Deals** who want to be associated with a premium ecosystem.
+Native player controls and keyboard interaction are disabled, player edge chrome sits outside the visible aperture, and the TV supplies loading, pause, autoplay recovery, and error screens. YouTube can still impose availability restrictions and insert provider content. Volume and mute persist across switches. Browsers that block sound autoplay show the TV's own Play button.
 
-### 4. Cross-Platform Conversion
-The "TV" acts as a top-of-funnel discovery tool. With integrated "Full Video" prompts and "Quick Links" to Merch, Communities, and Shows, it converts passive viewers into active, paying fans.
+Live verification: Conversations, Music, DJ sets, Vlogs, and Shorts played with random starts. The five Nusta Vibes videos returned “This video is unavailable” from YouTube's embedded player, despite having public watch pages. This channel preserves its original playlist and shows a TV error after trying its members; it needs embed availability restored or replacement source files. It never substitutes videos from a different channel.
 
-### 5. Immersive Brand Experience
-Unlike the standard YouTube interface (which is filled with distractions and competitors' videos), Kratex TV provides a **walled garden** where the user is 100% immersed in *your* world and *your* aesthetic.
+The old `ticker.json` and `settings.json` remain available for existing content, but the new room UI does not use the scrolling ticker or the old video zoom. Existing brand assets, social destinations, and Google Analytics ID are retained; the coffee widget is now a footer link so it does not overlap the remote.
 
----
+## Keyboard
 
-## 🛠️ Technical Stack
-*   **Frontend**: Vanilla JS, HTML5, CSS3.
-*   **API**: YouTube IFrame API & LemnosLife Proxy for metadata.
-*   **Performance**: Zero heavy frameworks; optimized for fast loading on lower-end mobile devices.
+| Key | Action |
+| --- | --- |
+| Left / right | Previous / next channel |
+| Up / down | Volume |
+| Space | Play / pause |
+| 1–6 | Select channel |
+| P / M | Power / mute |
+| L / F | Picture / fullscreen |
+| R / D | Remote / day and night |
+| ? | Shortcut guide |
+| Escape | Close remote or shortcut guide; exit fullscreen |
 
----
-*Created by the Kratex Media Team. Redefining how Marathi culture is consumed globally.*
+Keyboard shortcuts and pointer input stay in the main page; the embedded player is excluded from focus and pointer interaction. Fullscreen availability depends on the browser.
+
+## Files
+
+- `server.mjs`: Node HTTP server; public asset allowlist, safe path resolution, video byte ranges, and `/health`.
+- `index.html`: room, TV, channel guide, and accessible remote markup.
+- `style.css`: scenery, lighting, CRT materials, responsive layouts, and transitions.
+- `script.js`: room UI, player adapter, remote, keyboard shortcuts, and preferences.
+- `playback.js`: channel isolation, random video selection/seeking, retries, and playback history.
+- `channel-catalog.json`: public video IDs verified against each playlist.
+- `lib/playlist-catalog.mjs` and `scripts/sync-channels.mjs`: playlist extraction and catalog refresh.
+- `config.json`: channel playlists.
+- `assets/`: existing Kratex logo, font, teaser video, and images.
+- `tests/`: Node's built-in test runner; no package installation required.
+
+YouTube integration references: [IFrame API](https://developers.google.com/youtube/iframe_api_reference), [player parameters](https://developers.google.com/youtube/player_parameters).
