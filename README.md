@@ -29,11 +29,12 @@ For production, run behind an HTTPS reverse proxy with a Node process manager. T
 
 ## Experience
 
-- A CSS-built CRT, record cabinet, poster, lamp, and window. Video stays inside the TV aperture; the remote provides the controls.
+- An Akai-inspired 4:3 CRT with a deep black bezel and slim lower chin, in a room with a record cabinet, poster, lamp, and window. Video stays inside the TV aperture.
 - Night by default, with a day/night switch that changes the room's lighting, sky, sun/moon, and colors.
 - Hover over **Remote** to reveal it; click or tap to keep it open. Click outside or press Escape to dismiss it.
-- Power, six channel buttons, previous/next video, play/pause, volume, mute, picture modes, channel guide, and fullscreen.
-- Y2K, clean, VHS, and black-and-white picture modes.
+- Separate CHANNEL and PROGRAM rockers on the remote, plus power, six channel presets, play/pause, volume, mute, picture modes, help, and fullscreen.
+- The only row below the TV is the current program name and a **View full video** link. The link opens that video from the beginning on YouTube in a new tab and pauses the TV.
+- Y2K, clean, VHS, and black-and-white picture modes, controlled from the remote.
 - Responsive phone layouts, semantic buttons, keyboard navigation, reduced-motion support, and saved room/audio/picture/channel preferences.
 - The local teaser is muted. YouTube loads only after the visitor switches on or selects a channel. Failed connections, unavailable embeds, and blocked autoplay have recovery controls.
 
@@ -51,19 +52,20 @@ For production, run behind an HTTPS reverse proxy with a Node process manager. T
 
 The first visit selects DJ sets; later visits restore the selected channel. `channel-catalog.json` holds verified playlist members. After editing playlist IDs or adding videos on YouTube, run `npm run sync:channels`. The sync follows playlist pagination, handles Shorts, excludes recommendations, and replaces the catalog only when every playlist has loaded successfully. No API key or LemnosLife proxy is required.
 
-Each channel switch selects a random member of that channel and a random point before its ending. Next video does the same, avoiding an immediate repeat; previous video uses the channel's playback history. Shorts with unknown duration are sought once their duration becomes available. A fresh player and request token isolate every switch, so late events from an old channel cannot show the wrong video. The picture is revealed only after the selected video is playing at its chosen point. Unavailable embeds retry other members of the same channel, up to five attempts.
+Each channel switch selects a random member of that channel and a random point before its ending. PROGRAM +/− steps forward/backward through that channel’s playlist and wraps at either end. Each program gets a random start; automatic advancement also stays in playlist order. Shorts with unknown duration are sought once their duration becomes available. A fresh player and request token isolate every switch, so late events from an old channel cannot show the wrong video. The picture is revealed only after the selected video is playing at its chosen point. Unavailable embeds retry other members of the same channel, up to five attempts.
 
 Native player controls and keyboard interaction are disabled, player edge chrome sits outside the visible aperture, and the TV supplies loading, pause, autoplay recovery, and error screens. YouTube can still impose availability restrictions and insert provider content. Volume and mute persist across switches. Browsers that block sound autoplay show the TV's own Play button.
 
 Live verification: Conversations, Music, DJ sets, Vlogs, and Shorts played with random starts. The five Nusta Vibes videos returned “This video is unavailable” from YouTube's embedded player, despite having public watch pages. This channel preserves its original playlist and shows a TV error after trying its members; it needs embed availability restored or replacement source files. It never substitutes videos from a different channel.
 
-The old `ticker.json` and `settings.json` remain available for existing content, but the new room UI does not use the scrolling ticker or the old video zoom. Existing brand assets, social destinations, and Google Analytics ID are retained; the coffee widget is now a footer link so it does not overlap the remote.
+The old `ticker.json` and `settings.json` remain available for existing content, but the new room UI does not use the scrolling ticker or the old video zoom. Existing brand assets and Google Analytics ID are retained. The channel-card grid, footer links, physical TV buttons, and secondary playback labels are removed to keep the room uncluttered.
 
 ## Keyboard
 
 | Key | Action |
 | --- | --- |
 | Left / right | Previous / next channel |
+| [ / ] | Previous / next program within the channel |
 | Up / down | Volume |
 | Space | Play / pause |
 | 1–6 | Select channel |
@@ -78,7 +80,7 @@ Keyboard shortcuts and pointer input stay in the main page; the embedded player 
 ## Files
 
 - `server.mjs`: Node HTTP server; public asset allowlist, safe path resolution, video byte ranges, and `/health`.
-- `index.html`: room, TV, channel guide, and accessible remote markup.
+- `index.html`: room, Akai-style TV, full-video link, and accessible remote markup.
 - `style.css`: scenery, lighting, CRT materials, responsive layouts, and transitions.
 - `script.js`: room UI, player adapter, remote, keyboard shortcuts, and preferences.
 - `playback.js`: channel isolation, random video selection/seeking, retries, and playback history.

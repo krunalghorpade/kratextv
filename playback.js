@@ -34,7 +34,8 @@ export class BroadcastController {
     this.clearTimers(old);
     try { old.player?.mute(); old.player?.destroy(); } catch { /* A replaced iframe may already be detached. */ }
   }
-  async tune(channelId, { previous = false, failed = [] } = {}) {
+  async tune(channelId, { direction = 0, failed = [] } = {}) {
+    const fromId = this.active?.channelId === channelId ? this.active.video?.id : null;
     this.generation++;
     this.dispose();
     const session = { token: this.generation, channelId, failed, player: null, video: null, revealed: false, paused: false, seekApplied: false, start: null, settleAt: null, playing: false };
@@ -48,13 +49,16 @@ export class BroadcastController {
       const videos = catalog.videos.filter(v => /^[\w-]{11}$/.test(v.id));
       const history = this.history.get(channelId) || [];
       const oldId = history.at(-1);
-      const priorId = previous && history.length > 1 ? history.at(-2) : null;
-      const video = (priorId && videos.find(v => v.id === priorId && !failed.includes(v.id))) || chooseVideo(videos, oldId, this.random, failed);
+      // Channel changes start randomly; program changes follow the active playlist's order.
+      const fromIndex = videos.findIndex(v => v.id === fromId);
+      const neighbor = direction && fromIndex >= 0
+        ? videos[(fromIndex + Math.sign(direction) + videos.length) % videos.length] : null;
+      const video = (neighbor && !failed.includes(neighbor.id) && neighbor) || chooseVideo(videos, oldId, this.random, failed);
       if (!video) throw new Error('No playable videos are available in this channel right now.');
       session.video = video;
       session.videoCount = videos.length;
       session.start = video.duration > 0 ? randomStart(video.duration, this.random) : null;
-      this.emit({ type: 'selected', channelId, video, start: session.start });
+      this.emit({ type: 'selected', channelId, video, start: session.start, index: videos.indexOf(video), count: videos.length });
       const player = await this.createPlayer({
         video, start: session.start || 0,
         isCurrent: () => this.current(session),
@@ -78,7 +82,13 @@ export class BroadcastController {
   ready(session, player) {
     if (!this.current(session)) { player.destroy(); return; }
     session.player = player;
-    player.mute(); player.setVolume(this.volume); player.playVideo();
+    player.mute(); player.setVolume(this.volume);
+    if (session.paused) {
+      player.pauseVideo();
+      this.emit({ type: 'paused', channelId: session.channelId });
+      return;
+    }
+    player.playVideo();
     this.armTimeout(session);
   }
   onState(session, event) {
@@ -116,7 +126,7 @@ export class BroadcastController {
       this.armTimeout(session);
     } else if (event.data === 0 && actualId === session.video.id) {
       // A single-video embed has no playlist/recommendation authority over the TV.
-      this.tune(session.channelId);
+      this.tune(session.channelId, { direction: 1 });
     }
   }
   checkPosition(session) {
@@ -174,11 +184,11 @@ export class BroadcastController {
   }
   pause() {
     const session = this.active;
-    if (!session?.player) return;
+    if (!session || session.error) return;
     session.paused = true; session.playing = false;
     this.clearTimers(session);
     this.emit({ type: 'paused', channelId: session.channelId });
-    session.player.pauseVideo();
+    session.player?.pauseVideo();
   }
   resume() {
     const session = this.active;

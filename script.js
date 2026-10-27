@@ -101,7 +101,7 @@ function applyTheme() {
 }
 function applyLook() {
   document.body.dataset.look = state.look;
-  $('look-indicator').textContent = `${lookNames[state.look]} PICTURE`;
+  $('look-indicator').textContent = lookNames[state.look];
   storage.set('look', state.look);
 }
 function updateStandbyVideo() {
@@ -119,33 +119,21 @@ async function loadConfig() {
     const saved = state.channels.findIndex((channel) => channel.id === storage.get('channel', null));
     const dj = state.channels.findIndex((channel) => channel.name.toLowerCase().includes('dj'));
     state.channel = saved >= 0 ? saved : Math.max(0, dj);
-    $('channel-grid').replaceChildren();
     $('remote-numbers').replaceChildren();
-    $('channel-count').textContent = ` / ${String(state.channels.length).padStart(2, '0')}`;
     state.channels.forEach((channel, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'channel-card';
-      button.dataset.channel = index;
-      button.setAttribute('aria-label', `Channel ${index + 1}: ${channelName(channel)}`);
-      const values = [`CH ${String(index + 1).padStart(2, '0')}`, channelName(channel), channelCopy[channel.name.toLowerCase()]?.[1] || 'Tune in & zone out'];
-      ['channel-number', 'channel-name', 'channel-description'].forEach((className, i) => {
-        const span = document.createElement('span'); span.className = className; span.textContent = values[i]; button.append(span);
-      });
-      $('channel-grid').append(button);
       const number = document.createElement('button');
       number.type = 'button'; number.textContent = index + 1; number.dataset.channel = index;
       number.setAttribute('aria-label', `Channel ${index + 1}: ${channelName(channel)}`);
+      number.title = `${index + 1} · ${channelName(channel)}`;
       $('remote-numbers').append(number);
     });
     syncChannel();
     return true;
   } catch {
-    const message = document.createElement('p'); message.className = 'config-loading';
-    message.textContent = 'The channel guide couldn’t load.';
-    const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Try again';
+    $('remote-display-name').textContent = 'CHANNELS UNAVAILABLE';
+    const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Retry channels';
     retry.addEventListener('click', () => { configPromise = loadConfig(); });
-    message.append(retry); $('channel-grid').replaceChildren(message);
+    $('remote-numbers').replaceChildren(retry);
     return false;
   }
 }
@@ -209,7 +197,14 @@ const broadcast = new BroadcastController({
       screen.dataset.playlistId = event.channelId;
       screen.dataset.startSeconds = event.start ?? '';
       setStatus(`TUNING IN / CH ${channelNumber()}`, event.video.title);
+      $('program-strip').hidden = false;
+      $('program-title').title = event.video.title;
+      $('full-video-link').href = `https://www.youtube.com/watch?v=${event.video.id}`;
+      $('full-video-link').setAttribute('aria-label', `View full video: ${event.video.title} (opens in a new tab)`);
+      $('full-video-link').hidden = false;
+      $('remote-program').textContent = `PROGRAM ${String(event.index + 1).padStart(2, '0')} / ${event.count}`;
     } else if (event.type === 'loading') {
+      if (!event.buffering) $('program-strip').hidden = true;
       setPlaying(false);
       showMessage(event.buffering ? 'Hold that frequency…' : 'Finding your frequency…', event.retrying ? 'Trying another video from this channel.' : `Tuning into ${channelName(currentChannel())}.`);
     } else if (event.type === 'playing') {
@@ -225,7 +220,7 @@ const broadcast = new BroadcastController({
       screen.dataset.errorCode = event.code ?? '';
       setPlaying(false);
       showMessage('A little signal trouble.', event.message, 'error');
-      setStatus(`SIGNAL INTERRUPTED / CH ${channelNumber()} / ${channelName(currentChannel()).toUpperCase()}`, 'Try again or pick another channel.');
+      setStatus(`SIGNAL INTERRUPTED / CH ${channelNumber()} / ${channelName(currentChannel()).toUpperCase()}`);
       announce(event.message);
     }
   },
@@ -254,7 +249,7 @@ function tune(options = {}) {
   osd(`CH ${channelNumber()} · ${channelName(currentChannel()).toUpperCase()}`);
 }
 async function powerOn() {
-  if (!state.channels.length && !(await configPromise)) { announce('The channels could not load. Use Try again in the channel guide.'); return; }
+  if (!state.channels.length && !(await configPromise)) { showMessage('The channels couldn’t load.', 'Check your connection and try again.', 'error'); announce('The channels could not load. Try again.'); return; }
   tune();
 }
 function powerOff() {
@@ -267,7 +262,10 @@ function powerOff() {
   $('tv-power').setAttribute('aria-label', 'Turn television on');
   $('screen-message').hidden = true; $('standby-screen').hidden = false;
   $('screen-osd').classList.remove('visible');
-  setStatus('READY WHEN YOU ARE', 'Your front-row seat to the world of Kratex.');
+  $('program-strip').hidden = true;
+  $('full-video-link').removeAttribute('href');
+  $('remote-program').textContent = 'PROGRAM —';
+  setStatus('TELEVISION OFF', '');
   updateStandbyVideo(); announce('Television off');
 }
 function selectChannel(index) {
@@ -287,7 +285,7 @@ function playPause() {
 }
 function changeProgram(direction) {
   if (!state.powered) { powerOn(); return; }
-  tune({ previous: direction < 0 });
+  tune({ direction });
 }
 async function fullscreen() {
   try {
@@ -309,7 +307,7 @@ const actions = {
   'program-next': () => changeProgram(1), 'program-prev': () => changeProgram(-1), play: playPause,
   look: () => { state.look = looks[(looks.indexOf(state.look) + 1) % looks.length]; applyLook(); osd(`${lookNames[state.look]} PICTURE`); },
   fullscreen,
-  guide: () => { remotePinned = false; setRemote(false); $('channel-section').scrollIntoView({ behavior: reduceMotion.matches ? 'instant' : 'smooth', block: 'center' }); document.querySelector('.channel-card')?.focus({ preventScroll: true }); },
+  shortcuts: () => $('shortcuts-dialog').showModal(),
 };
 document.addEventListener('click', (event) => {
   const channel = event.target.closest('[data-channel]');
@@ -318,8 +316,12 @@ document.addEventListener('click', (event) => {
   if (action) actions[action.dataset.action]?.();
   if (!$('remote-dock').contains(event.target)) { remotePinned = false; setRemote(false); }
 });
-$('watch-button').addEventListener('click', () => { $('tv-power').focus({ preventScroll: true }); powerOn(); });
-$('retry-button').addEventListener('click', () => tune());
+$('watch-button').addEventListener('click', () => { $('television').focus({ preventScroll: true }); powerOn(); });
+$('retry-button').addEventListener('click', async () => {
+  if (!state.channels.length) { configPromise = loadConfig(); if (!(await configPromise)) return; }
+  tune();
+});
+$('full-video-link').addEventListener('click', () => broadcast.pause());
 $('resume-button').addEventListener('click', playPause);
 $('theme-switch').addEventListener('click', () => { state.theme = state.theme === 'night' ? 'day' : 'night'; applyTheme(); });
 $('remote-toggle').addEventListener('click', () => { remotePinned = !remotePinned; setRemote(remotePinned); });
@@ -329,14 +331,13 @@ $('remote-dock').addEventListener('pointerleave', () => {
 });
 $('remote-dock').addEventListener('focusin', () => setRemote(true));
 $('remote-dock').addEventListener('focusout', (event) => { if (!remotePinned && !$('remote-dock').contains(event.relatedTarget)) setRemote(false); });
-$('shortcuts-button').addEventListener('click', () => $('shortcuts-dialog').showModal());
 $('close-shortcuts').addEventListener('click', () => $('shortcuts-dialog').close());
 $('shortcuts-dialog').addEventListener('click', (event) => { if (event.target === $('shortcuts-dialog')) { const rect = event.target.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.target.close(); } });
 document.addEventListener('keydown', (event) => {
   if (event.ctrlKey || event.metaKey || event.altKey || event.target.closest('input, textarea, select, [contenteditable="true"]') || $('shortcuts-dialog').open) return;
   if (event.key === 'Escape') { remotePinned = false; if ($('remote').contains(document.activeElement)) $('remote-toggle').focus(); setRemote(false); return; }
   if (event.key === ' ' && event.target.closest('button, a')) return;
-  const shortcuts = { ArrowRight: 'channel-next', ArrowLeft: 'channel-prev', ArrowUp: 'volume-up', ArrowDown: 'volume-down', ' ': 'play', p: 'power', m: 'mute', l: 'look', f: 'fullscreen' };
+  const shortcuts = { ArrowRight: 'channel-next', ArrowLeft: 'channel-prev', ArrowUp: 'volume-up', ArrowDown: 'volume-down', ' ': 'play', p: 'power', m: 'mute', l: 'look', f: 'fullscreen', '[': 'program-prev', ']': 'program-next' };
   const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
   if (shortcuts[key]) { event.preventDefault(); if (!event.repeat || key.startsWith('Arrow')) actions[shortcuts[key]](); }
   else if (/^[1-9]$/.test(key) && Number(key) <= state.channels.length) { event.preventDefault(); selectChannel(Number(key) - 1); }
@@ -344,7 +345,7 @@ document.addEventListener('keydown', (event) => {
   else if (key === 'r') { remotePinned = !$('remote-dock').classList.contains('is-open'); setRemote(remotePinned); }
   else if (key === '?') $('shortcuts-dialog').showModal();
 });
-function updateClock() { $('screen-clock').textContent = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(new Date()); }
+
 document.addEventListener('visibilitychange', updateStandbyVideo);
 document.addEventListener('fullscreenchange', () => {
   // Keep the remote available when the TV enters the browser's fullscreen layer.
@@ -352,6 +353,5 @@ document.addEventListener('fullscreenchange', () => {
   (fullscreenTV ? $('television') : document.body).append($('remote-dock'));
 });
 reduceMotion.addEventListener('change', updateStandbyVideo);
-applyTheme(); applyLook(); syncAudio(); updateClock(); updateStandbyVideo();
-setInterval(updateClock, 30000);
+applyTheme(); applyLook(); syncAudio(); updateStandbyVideo();
 configPromise = loadConfig();

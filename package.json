@@ -1,6 +1,6 @@
 {
   "name": "kratex-tv",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "description": "A little room, a CRT television, and six channels of Kratex.",
   "type": "module",

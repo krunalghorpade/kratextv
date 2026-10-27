@@ -103,6 +103,8 @@ test('unavailable videos retry inside the same channel and stop when exhausted',
   assert.equal(f.events.at(-1).type, 'error'); assert.equal(f.players.length, 2);
   f.players[1].change(1);
   assert.equal(f.events.at(-1).type, 'error');
+  f.controller.pause(); // Opening the external video must not hide the recovery controls.
+  assert.equal(f.events.at(-1).type, 'error');
 });
 
 test('pause/resume keeps the random position and audio preferences', async () => {
@@ -116,11 +118,44 @@ test('pause/resume keeps the random position and audio preferences', async () =>
   f.controller.setAudio(70, false); assert.equal(p.muted, false); assert.equal(p.volume, 70);
 });
 
+test('opening the full video while the TV loads keeps a late player paused', async () => {
+  let resolve;
+  const f = fixture(() => new Promise(r => { resolve = r; }));
+  const pending = f.controller.tune('dj');
+  f.controller.pause();
+  resolve(catalogs.dj); await pending;
+  const p = f.players[0];
+  p.ready(); p.change(1); f.tick(2000);
+  assert.equal(p.state, 2);
+  assert.equal(p.muted, true);
+  assert.equal(f.events.at(-1).type, 'paused');
+  assert.equal(f.events.some(event => event.type === 'playing'), false);
+});
+
 test('ended video advances within its channel without immediately repeating', async () => {
   const f = fixture(); await f.controller.tune('music'); const p = f.players[0]; f.settle(p);
   p.change(0); await flush();
   assert.equal(f.controller.active.channelId, 'music'); assert.notEqual(f.players[1].id, p.id);
   assert.equal(p.destroyed, true);
+});
+
+test('program navigation follows playlist order, wraps, and stays in its channel', async () => {
+  const playlist = { playlistId: 'music', videos: [video('music000001'), video('music000002'), video('music000003')] };
+  const f = fixture(async id => id === 'music' ? playlist : catalogs[id]);
+  await f.controller.tune('music');
+  assert.equal(f.controller.active.video.id, 'music000002');
+  for (const [direction, expected] of [[-1, 'music000001'], [-1, 'music000003'], [1, 'music000001'], [1, 'music000002']]) {
+    await f.controller.tune('music', { direction });
+    assert.equal(f.controller.active.channelId, 'music');
+    assert.equal(f.controller.active.video.id, expected);
+    assert.ok(f.controller.active.start > 0);
+    const selected = f.events.at(-1);
+    assert.equal(selected.type, 'selected');
+    assert.equal(selected.index, playlist.videos.findIndex(v => v.id === expected));
+    assert.equal(selected.count, 3);
+  }
+  await f.controller.tune('dj');
+  assert.equal(f.controller.active.video.id, 'djset000001');
 });
 
 test('turning off cancels timers and a pending catalog load', async () => {
